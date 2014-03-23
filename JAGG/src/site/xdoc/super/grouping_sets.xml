@@ -1,0 +1,223 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Grouping Sets - Super Aggregation</title>
+    </properties>
+    <body>
+        <section id="groupingSets" name="Grouping Sets">
+            <p>One of the ways that jAgg supports super aggregation is by supporting grouping sets.
+            Normally, jAgg calculates aggregate values based on all "group by" properties specified
+            in the Builder object.  However, sometimes different levels of aggregation are desired.
+            For example, jAgg supports rollups and cubes.  However, for more control over the exact
+            grouping sets desired, one can explicitly state the grouping sets.</p>
+            <p>Once can simply call jAgg again, with less properties, to obtain the desired
+            slices, but that would mean a separate pass through the data for each level of super
+            aggregation.  With grouping sets, and super aggregation in general, jAgg reuses the
+            Aggregators that were used to calculate the original, normal aggregate values, in order
+            to calculate the new super aggregate values.</p>
+        </section>
+        <section id="understanding" name="Understanding Grouping Sets">
+            <p>When a set of grouping sets is specified, jAgg needs to know which properties by
+            which to create all different slices.  jAgg expects 0-based indices to specify which
+            properties.  These indices refer to the original list of property names that was
+            supplied to the Builder object.  jAgg will create subtotals for every specified
+            grouping set.</p>
+            <p>Cubes and rollups are special cases of specifying the grouping sets.  If there are
+            four properties, then:</p>
+            <ul>
+                <li>rollup({1, 2, 3}) = groupingSets({0, 1, 2, 3}, {0, 1, 2}, {0, 1}, {0})</li>
+                <li>rollup({2}) = groupingSets({0, 1, 2, 3}, {0, 1, 3})</li>
+                <li>rollup({0, 1, 2, 3}) = groupingSets({0, 1, 2, 3}, {0, 1, 2}, {0, 1}, {0}, {})</li>
+                <li>cube({0, 1, 2}) = groupingSets({0, 1, 2, 3}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3}, {0, 3}, {1, 3}, {2, 3}, {3})</li>
+            </ul>
+            <p>In this example, four property names were originally specified to jAgg.  Without
+            grouping sets, normal aggregation proceeds and here are the results:</p>
+            <source>
+List&lt;String&gt; properties = Arrays.asList("property1", "property2", "property3", "property4");
+List&lt;Aggregator&gt; aggs = Arrays.asList(Aggregator.getAggregator("Sum(value)"));
+Aggregation agg = new Aggregation.Builder()
+   .setProperties(properties)
+   .setAggregators(aggs)
+   .build();
+List&lt;AggregateValue&lt;TestRec&gt;&gt; aggValues = agg.groupBy(testRecords);
+            </source>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>true</td> <td>2</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td>  <td>false</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>true</td> <td>6</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td>  <td>green</td> <td>false</td> <td>10</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>true</td> <td>102</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>false</td> <td>103</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>true</td> <td>106</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>false</td> <td>110</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>true</td> <td>1002</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td>  <td>false</td> <td>1003</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>true</td> <td>1006</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td>  <td>green</td> <td>false</td> <td>1010</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>true</td> <td>1102</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>false</td> <td>1103</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>true</td> <td>1106</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>false</td> <td>1110</td>
+                </tr>
+            </table>
+            <p>Here are the new results when the following grouping sets are specified: {2, 3} and
+            {0, 1}.   Notice that the original set of "normal" aggregate values (grouping set
+            {0, 1, 2, 3}) is no longer returned.</p>
+            <source>
+List&lt;String&gt; properties = Arrays.asList("property1", "property2", "property3", "property4");
+List&lt;Aggregator&gt; aggs = Arrays.asList(Aggregator.getAggregator("Sum(value)"));
+List&lt;List&lt;Integer&gt;&gt; groupingSets = Arrays.asList(
+   Arrays.asList(2, 3),
+   Arrays.asList(0, 1));
+Aggregation agg = new Aggregation.Builder()
+   .setProperties(properties)
+   .setAggregators(aggs)
+   .setGroupingSets(groupingSets)
+   .build();
+List&lt;AggregateValue&lt;TestRec&gt;&gt; aggValues = agg.groupBy(testRecords);
+            </source>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                </tr>
+                <!-- Grouping set {2, 3} -->
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>red</td> <td>true</td> <td>2208</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>red</td> <td>false</td> <td>2212</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>green</td> <td>true</td> <td>2224</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>green</td> <td>false</td> <td>2240</td>
+                </tr>
+                <!-- Grouping set {0, 1} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>21</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>421</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4021</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4421</td>
+                </tr>
+            </table>
+            <p>Only those grouping sets specified are returned.</p>
+            <p>It is possible to specify multiple grouping sets at once, as long as there are no
+            duplicate grouping sets.</p>
+        </section>
+        <section id="id" name="Identifying Grouping Sets">
+            <p>If a certain property represents "all values", then the result from
+            <code>getPropertyValue</code> for that property will be <code>null</code>.  But what if
+            <code>null</code> is the actual value being aggregated?  jAgg tells these cases apart
+            with the help of the methods <code>isGrouping()</code> and <code>getGroupingId</code>.</p>
+            <ul>
+                <li><code>isGrouping(int field)</code> - Determines whether the property referenced
+                by the given 0-based index represents "all values".  If true, then
+                <code>getPropertyValue(field)</code> returns <code>null</code> and this is a super
+                aggregate value.  If false, then <code>getPropertyValue(field)</code> can return
+                any value, including <code>null</code>, and this aggregate value does not represent
+                "all values" for this property.</li>
+                <li><code>isGrouping(String propertyName)</code> - Determines whether the given
+                property represents "all values".  If true, then
+                <code>getPropertyValue(field)</code> returns <code>null</code> and this is a super
+                aggregate value.  If false, then <code>getPropertyValue(field)</code> can return
+                any value, including <code>null</code>, and this aggregate value does not represent
+                "all values" for this property.</li>
+                <li><code>getGroupingId(List&lt;?&gt; fields)</code> - Creates a distinct integer
+                grouping set ID based on the referenced fields, which may be 0-based integer
+                references or property name strings, or both.  Every aggregate value that has the
+                same properties representing "all values" has the same integer ID.</li>
+            </ul>
+            <p>Here is the same example as above, but with the above method call results included.</p>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                    <td>isGrouping(0)</td> <td>isGrouping(1)</td> <td>isGrouping(2)</td> <td>isGrouping(3)</td>
+                    <td>getGroupingId({0, 1})</td> <td>getGroupingId({0, 1, 2, 3})</td>
+                </tr>
+                <!-- Grouping set {2, 3} -->
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>red</td> <td>true</td> <td>2208</td>
+                    <td>true</td> <td>true</td> <td>false</td> <td>false</td>
+                    <td>3</td> <td>12</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>red</td> <td>false</td> <td>2212</td>
+                    <td>true</td> <td>true</td> <td>false</td> <td>false</td>
+                    <td>3</td> <td>12</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>green</td> <td>true</td> <td>2224</td>
+                    <td>true</td> <td>true</td> <td>false</td> <td>false</td>
+                    <td>3</td> <td>12</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>green</td> <td>false</td> <td>2240</td>
+                    <td>true</td> <td>true</td> <td>false</td> <td>false</td>
+                    <td>3</td> <td>12</td>
+                </tr>
+                <!-- Grouping set {0, 1} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>21</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>421</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4021</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4421</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+            </table>
+        </section>
+    </body>
+</document>

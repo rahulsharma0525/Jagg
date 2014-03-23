@@ -1,0 +1,35 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Discriminable Interface</title>
+    </properties>
+    <body>
+        <section id="intro" name="Introduction">
+            <p>jAgg supports discriminating objects that have properties such as
+            <code>Integers</code> and <code>Strings</code>, with built-in Discriminators.  But what
+            if the property is an object type defined outside of Java and jAgg, e.g.
+            <code>Widget</code>?  How is a <code>Widget</code> to be discriminated?  It can only be
+            discriminated if it implements the <code>Discriminable</code> interface.</p>
+        </section>
+        <section id="interface" name="Discriminable Interface">
+            <p>The <code>Discriminable</code> interface is to be implemented by the user's own
+            object types that are properties of the main object type to be discriminated.  It is
+            not necessary for such a type to implement <code>Discriminable</code>, because jAgg
+            will fall back on sorting if it cannot discriminate an object type that it encounters.
+            But it is necessary to complete the multiset discrimination.  This interface allows
+            multiset discrimination to take place for any object types.  The
+            <code>Discriminable</code> interface defines only one method:</p>
+            <ul>
+                <li><code>public List&lt;String&gt; getDiscriminableProperties()</code> - Return a
+                <code>List</code> of property names that can be used to discriminate objects of
+                this type.  </li>
+            </ul>
+            <p>jAgg creates and uses a <a href="discriminable.html">DiscriminableDiscriminator</a>
+            to discriminate objects that are <code>Discriminable</code>.  The
+            <code>DiscriminableDiscriminator</code> calls the above method to obtain the list of
+            properties.  Then it creates and uses a
+            <a href="properties.html">PropertiesDiscriminator</a> to perform the actual
+            discrimination on the object type.</p>
+        </section>
+    </body>
+</document>

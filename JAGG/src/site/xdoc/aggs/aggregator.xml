@@ -1,0 +1,53 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg Aggregator Class</title>
+    </properties>
+    <body>
+        <section id="aggregator" name="Aggregator">
+            <p>To accomplish the aggregate functionality desired, the Aggregation class uses a
+                cache of Aggregator objects that perform the actual aggregation calculations.
+                These Aggregator objects are analogous to the Oracle object types that can be
+                created for custom aggregation functions.  The Aggregator class itself is an
+                abstract class that does the following:
+            </p>
+            <ol>
+                <li>Defines the interface that the Aggregation class expects.</li>
+                <li>Acts a Factory for creating Aggregator objects.  The static Factory Method
+                    “Aggregator.getAggregator” accesses an <code>AggregatorCache</code>.</li>
+                <li>Calculates an aggregate value based on all values in the original List of Objects
+                    that have equivalent “group by” properties.</li>
+                <li>The Aggregator class uses a <code>MethodCache</code> that uses reflection to find
+                    and cache <code>Method</code> objects so that subclasses may access the object’s
+                    desired properties for the purposes of the aggregation calculation.</li>
+                <li>Defines <code>equals</code> and <code>hashCode</code> so that it may be the key to
+                    a <code>HashMap</code> stored internally in the <code>AggregateValue</code> class,
+                    which stores the actual aggregate values.</li>
+            </ol>
+            <p>Subclasses of <code>Aggregator</code> implement the abstract methods <code>init</code>,
+                <code>iterate</code>, <code>merge</code>, and <code>terminate</code> that do the actual
+                aggregation.  They also implement the abstract method <code>replicate</code> to return a
+                new <code>Aggregator</code> of the same type, but un-initialized.
+            </p>
+            <p>Additionally, subclasses of <code>Aggregator</code> may use other
+                <code>Aggregators</code> internally to facilitate calculations.  These would
+                typically need to create a numeric result precisely.  Optionally, some
+                <code>Aggregators</code> override the <code>terminateDoubleDouble</code> method.
+                This allows an <code>Aggregator</code> subclass to be used internally by other
+                <code>Aggregators</code>, to maintain a high level of precision during internal
+                calculations.
+            </p>
+        </section>
+        <section id="factory" name="Factory Method">
+            <p>The Aggregator class defines a static Factory Method called <code>getAggregator</code>
+                that takes as its only argument an <strong>aggregator specification string</strong>,
+                in the format "aggname(property)", where "aggname" is name of the Aggregator
+                class, minus the suffix "Aggregator", and "property" is the property string
+                normally sent to the Aggregator's constructor.  This factory method is an alternative
+                to directly instantiating Aggregators in code.  It may return an existing, unused
+                Aggregator that is already in the internal cache.  Such a cached Aggregator would
+                be the desired type and have the same property to process.
+            </p>
+        </section>
+    </body>
+</document>

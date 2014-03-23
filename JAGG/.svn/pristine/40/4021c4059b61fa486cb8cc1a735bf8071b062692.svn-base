@@ -1,0 +1,25 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>CollectAggregator</title>
+    </properties>
+    <body>
+        <section id="collect" name="CollectAggregator">
+            <p>A <code>CollectAggregator</code> is an Aggregator that extracts the property values
+            and adds them to a <code>List</code>, which is returned when finished.  If no values
+            were encountered, then the returned list is empty.  This Aggregator does not use
+            floating-point calculations, so it does not override the
+            <code>terminateDoubleDouble</code> method.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>CollectAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new CollectAggregator("property");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Collect(property)");</code></li>
+            </ul>
+            <p>There is no restriction on the type of property values expected.</p>
+            <p>The list is built by adding the property values in the order in which jAgg finds
+            them in the original list of values.</p>
+        </section>
+    </body>
+</document>

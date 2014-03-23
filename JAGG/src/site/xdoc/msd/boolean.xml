@@ -1,0 +1,26 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>BooleanDiscriminator</title>
+    </properties>
+    <body>
+        <section id="boolean" name="BooleanDiscriminator">
+            <p>A <code>BooleanDiscriminator</code> discriminates <code>Booleans</code>.  With
+            Java's auto-boxing feature, it doesn't matter whether <code>Boolean</code> objects or
+            <code>boolean</code> values are present; this Discriminator will discriminate them.
+            Because there are only two boolean values, the <code>BooleanDiscriminator</code> places
+            each item in one of two buckets, for <code>false</code> and <code>true</code>.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{true, false, true, true, true, false, false, true, false, false}</li>
+            </ul>
+            <p>... a <code>BooleanDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{true, true, true, true, true}</li>
+                <li>{false, false, false, false, false}</li>
+            </ul>
+        </section>
+    </body>
+</document>

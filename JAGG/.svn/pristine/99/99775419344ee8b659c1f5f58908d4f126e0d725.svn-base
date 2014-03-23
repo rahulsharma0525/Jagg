@@ -1,0 +1,29 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>ArrayDiscriminator</title>
+    </properties>
+    <body>
+        <section id="array" name="ArrayDiscriminator">
+            <p>An <code>ArrayDiscriminator</code> discriminates arrays.  It discriminates its input
+            by discriminating against each of its parts, one at a time.  Because it discriminates
+            arrays, it extracts each element of the array in turn, and discriminates on those
+            values.  It determines which <code>Discriminator</code> to use on the elements based on
+            the type of the first non-null array element it encounters.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{[0], [1, 2, 3], [1, 3, 2], [1, 2, 3], [1], [0], [1, 3, 2], [0, 1]}</li>
+            </ul>
+            <p>... an <code>ArrayDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{[1]}</li>
+                <li>{[0, 1]}</li>
+                <li>{[0], [0]}</li>
+                <li>{[1, 2, 3], [1, 2, 3]}</li>
+                <li>{[1, 3, 2], [1, 3, 2]}</li>
+            </ul>
+        </section>
+    </body>
+</document>

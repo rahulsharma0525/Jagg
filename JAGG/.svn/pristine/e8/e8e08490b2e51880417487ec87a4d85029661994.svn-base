@@ -1,0 +1,54 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg - Getting Started</title>
+    </properties>
+    <body>
+        <section id="introduction" name="Introduction">
+            <p>jAgg runs aggregate calculations on any <code>List</code> of objects.  It doesn't
+            care where the objects came from; those object classes don't need to extend any jAgg
+            base class or implement any jAgg interface.</p>
+            <p>Just supply some <code>Aggregators</code> at a minimum, and jAgg will take care of
+            the rest.  These Aggregators specify what aggregate operation to perform, and on which
+            object property to perform them.  These properties are assumed to named in Java Beans
+            naming convention, e.g. "propOne" means the zero-argument method "getPropOne".  For
+            <code>boolean</code> getters, the zero-argument method "isPropOne" will be searched for
+            also.  jAgg returns a <code>List</code> of <code>AggregateValues</code>, which wrap
+            your object and store the aggregate values.</p>
+            <p>Optionally, specify a <code>List</code> of properties that jAgg will "group by".
+            This works like the "group by" clause in standard SQL.  That is, jAgg will produce one
+            <code>AggregateValue</code> for each set of objects that have the same properties,
+            among those listed.</p>
+            <p>Optionally, specify grouping sets, rollups, or cubes.  Such "super aggregate"
+            operations are implemented to provide subtotals and/or grand totals for certain
+            categories.</p>
+            <p>Optionally, specify a degree of parallelism.  For large datasets, this may make
+            jAgg faster by having different Threads perform the calculations in parallel.</p>
+            <p>Normally, jAgg uses sorting to gather all objects whose properties compare equal
+            together.  Optionally, specify to use <a href="../msd/msd.html">Multiset
+            Discrimination</a> instead.  AggregateValues may no longer come out in sorted order,
+            but Multiset Discrimination is a faster way to "group" all objects together whose
+            properties compare equal.</p>
+        </section>
+        <section id="builder" name="Build Your Aggregation Object">
+            <p>There are many different options to specify for aggregate operations, and most of
+            them are optional.  Use the <code>Builder</code> class inside the
+            <code>Aggregation</code> class to specify the desired options and create an
+            <code>Aggregation</code> object that will perform the actual aggregation operations.</p>
+            <p>Here is example code that demonstrates all of the Builder options.</p>
+            <source>
+Aggregation agg = new Aggregation.Builder()
+   .setAggregators(aggsList)
+   .setProperties(propertiesList)
+   .setParallelism(numThreads)
+   .setUseMsd(true)
+   .setCube(integerPropIndexList)
+   .build();
+List&lt;AggregateValue&lt;Record&gt;&gt; aggValues = agg.groupBy(listOfYourObjects);
+            </source>
+            <p>In place of "setCube", one can also use "setRollups" or "setGroupingSets".  Each of
+            these three would overwrite the other if previously called.  If any of these three are
+            called, then it is required to call "setProperties" before it is called.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,33 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>CollectionDiscriminator</title>
+    </properties>
+    <body>
+        <section id="collection" name="CollectionDiscriminator">
+            <p>A <code>CollectionDiscriminator</code> discriminates <code>Collections</code>.  It
+            discriminates its input by creating a new <code>ArrayList</code> to be a shallow copy
+            of the given <code>Collection</code>, then it uses a
+            <code>RandomAccessListDiscriminator</code> to discriminate on the ArrayList.
+            <code>ArrayLists</code> are <code>RandomAccess</code>, which means that element access
+            should be constant-time.  <code>Collections</code> are not necessarily
+            <code>RandomAccess</code>.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{Arrays.asList(1, 2, 3), new LinkedList(Arrays.asList(1, 2, 3)),
+                     new HashSet(Arrays.asList(1, 2, 3)), new ArrayList(Arrays.asList(1, 2, 3)),
+                     Arrays.asList(1, 2, 4), Arrays.asList(5), Arrays.asList(3, 2, 1)}</li>
+            </ul>
+            <p>... a <code>CollectionDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{Arrays.asList(1, 2, 4)}</li>
+                <li>{Arrays.asList(5)}</li>
+                <li>{Arrays.asList(3, 2, 1)}</li>
+                <li>{Arrays.asList(1, 2, 3), LinkedList(Arrays.asList(1, 2, 3),
+                     HashSet(Arrays.asList(1, 2, 3), ArrayList(Arrays.asList(1, 2, 3)}</li>
+            </ul>
+        </section>
+    </body>
+</document>

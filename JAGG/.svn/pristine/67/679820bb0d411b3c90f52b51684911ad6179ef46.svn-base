@@ -1,0 +1,26 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>AvgAggregator</title>
+    </properties>
+    <body>
+        <section id="avg" name="AvgAggregator">
+            <p>An <code>AvgAggregator</code> is an Aggregator that calculates the average of
+            numeric values, returning the average as a <code>Double</code>.  If no values were
+            encountered, then the returned average is <code>Double.NaN</code>.  This Aggregator
+            overrides the <code>terminateDoubleDouble</code> method, so that the average is also
+            available as a <a href="../dd/double_double.html">DoubleDouble</a>.  This allows the
+            average to be used by other Aggregators as a high-precision <code>DoubleDouble</code>.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use an <code>AvgAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new AvgAggregator("property");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Avg(property)");</code></li>
+            </ul>
+            <p>The values returned by the property of the object must be numeric.</p>
+            <p>The average is calculated as expected for the arithmetic mean, which is the sum of
+            all values divided by the count of all values.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,48 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>DiscriminableDiscriminator</title>
+    </properties>
+    <body>
+        <section id="discriminable" name="DiscriminableDiscriminator">
+            <p>A <code>DiscriminableDiscriminator</code> discriminates objects that implement the
+            <a href="discriminable_interface.html">Discriminable</a> interface.  Discriminators
+            exist for a wide variety of Java built-in types, but not for any generic object.  This
+            Discriminator discriminates <code>Discriminable</code> objects by calling the object's
+            <code>getDiscriminableProperties()</code> method to obtain a list of property names to
+            discriminate.  Then it delegates to a <code>PropertiesDiscriminator</code> to
+            discriminate the objects based on the values of those properties.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the class...</p>
+            <source>
+public class Widget implements Discriminable
+{
+    private int a;
+    private int b;
+    public Widget(int a, int b) {this.a = a; this.b = b;}
+    public int getA() { return a; }
+    public int getB() { return b; }
+    public int getResult() { return a + b; }
+    public List&lt;String&gt; getDiscriminableProperties() {
+       return Arrays.asList("result");
+    }
+}
+            </source>
+            <p>... and the input...</p>
+            <ul>
+                <li>{new Widget(1, 2), new Widget(2, 1), new Widget(5, 0), new Widget(5, 1),
+                     new Widget(3, 3), new Widget(0, 0), new Widget(4, 4), new Widget(5, 4)}</li>
+            </ul>
+            <p>... a <code>DiscriminableDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{Widget(5, 0)} - result 5</li>
+                <li>{Widget(0, 0)} - result 0</li>
+                <li>{Widget(4, 4)} - result 8</li>
+                <li>{Widget(5, 4)} - result 9</li>
+                <li>{Widget(1, 2), Widget(2, 1)} - result 3</li>
+                <li>{Widget(5, 1), Widget(3, 3)} - result 6</li>
+            </ul>
+        </section>
+    </body>
+</document>

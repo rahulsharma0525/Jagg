@@ -1,0 +1,32 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>CharacterDiscriminator</title>
+    </properties>
+    <body>
+        <section id="char" name="CharacterDiscriminator">
+            <p>A <code>CharacterDiscriminator</code> discriminates <code>Characters</code>.  With
+            Java's auto-boxing feature, it doesn't matter whether <code>Character</code> objects or
+            <code>char</code> values are present; this Discriminator will discriminate them.  It
+            discriminates its input by discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{'j', 'A', 'g', 'g', ' ', 'v', 'a', 'l', 'u', 'e'}</li>
+            </ul>
+            <p>... a <code>CharacterDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{'j'}</li>
+                <li>{'A'}</li>
+                <li>{' '}</li>
+                <li>{'v'}</li>
+                <li>{'a'}</li>
+                <li>{'l'}</li>
+                <li>{'u'}</li>
+                <li>{'e'}</li>
+                <li>{'g', 'g'}</li>
+            </ul>
+        </section>
+    </body>
+</document>

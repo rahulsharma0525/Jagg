@@ -1,0 +1,76 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Multiset Discrimination in jAgg</title>
+    </properties>
+    <body>
+        <section id="introduction" name="Introduction">
+            <p>When aggregating by a list of "group-by" properties, the developer has the option of
+            specifying Multiset Discrimination instead of sorting, in order to gather together all
+            items whose properties compare equal to each other prior to aggregation.  Normally,
+            sorting is used to achieve this aim.  Java's built-in method "Collections.sort" is used
+            to sort the input before aggregation.  It is a merge sort, which means it runs in
+            <em>O</em>(<em>n</em> log <em>n</em>) time.  For a lot of purposes, this is fine, and
+            additionally, it has the added benefit that the returned AggregateValues are placed in
+            the returned List in sorted order.  For those applications that need to aggregate a lot
+            of data, and the returned order does not matter, Multiset Discrimination is the answer.
+            While multiset discrimination may return results that are "out of order", it is able to
+            place items whose properties compare equal adjacent to each other, just like sorting
+            can.  However, unlike sorting, multiset discrimination runs in <em>O</em>(<em>n</em>)
+            time in the worst case.
+            </p>
+        </section>
+        <section id="basic" name="Basic Multiset Discrimination">
+            <p>All data can be eventually broken down to the bits and bytes of the data to analyze.
+            At the base case, jAgg discriminates 16-bit values.  It allocates an array "lists" of
+            2<sup>16</sup> Lists of items, and an array "used" of 2<sup>16</sup> integers to
+            represent used indices in the array of Lists.  Then it follows this algorithm:
+            </p>
+            <ol>
+                <li>For each element of the input List to discriminate, access the proper List from
+                    "lists", using the element value as the index.  Add the element to this list.</li>
+                <li>If the list was empty, then add the element value as the index to the list of
+                used indices, "used".</li>
+                <li>For each element in the "used" indices, add the corresponding List obtained
+                from "lists".  Clear the List from "lists".  Each of these lists is called an
+                <em>equivalence class</em>, consisting of only items compared equal.</li>
+                <li>Clear the list of used indices in "used" to prepare for reuse.</li>
+            </ol>
+            <p>A constant level of operations is performed for each element in the input List, so
+            the running time of this algorithm is <em>O</em>(<em>n</em>).
+            </p>
+            <p>Object types that implement the interface <code>Discriminator</code> are capable of
+            multiset discrimination on a particular type.
+            </p>
+        </section>
+        <section id="bigger" name="Multiset Discrimination On Bigger Types">
+            <p>Most object types can have more than 2<sup>16</sup> possible values.
+            So jAgg performs  multiset discrimination on those types hierarchically.  It can't do
+            its job on the entire value, so it does its job repeatedly, on <em>labels</em>.  A
+            <em>label</em> is a portion of a value that is used as the actual value during multiset
+            discrimination. It performs multiset discrimination on the first label, or 16 bytes, of
+            the value that it can, creating a set of equivalence classes.  Then, on each equivalence
+            class, it performs multiset discrimination on the next label, or 16 bytes, creating
+            another set of equivalence classes.  This process is repeated until the entire value is
+            used up.
+            </p>
+            <p>Objects that implement the <code>Extractor</code> interface are capable of taking
+            an element, and extracting a label from that element for this purpose.</p>
+            <p>For primitive values such as bytes, chars, shorts, and booleans, only one pass is
+            necessary. However, for other primitive types, such as integers, longs, floats, and
+            doubles, multiple passes are necessary.
+            </p>
+            <p>For more complex data types such as arrays, Strings, Collections, Dates, and
+            Calendars, each element is considered, one at a time, until all elements are
+            discriminated.</p>
+            <p>For this to work with a List of "group by" properties in jAgg, a
+            <code>PropertiesDiscriminator</code> is employed that will perform multiset
+            discrimination only on the properties specified.
+            </p>
+            <p>Sometimes, null values are encountered when performing multiset discrimination.  A
+            <code>NullDiscriminator</code> is employed to separate all <code>null</code> values
+            into their own equivalence class before passing on discrimination duties to another
+            Discriminator.</p>
+        </section>
+    </body>
+</document>

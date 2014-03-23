@@ -1,0 +1,30 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>LongDiscriminator</title>
+    </properties>
+    <body>
+        <section id="long" name="LongDiscriminator">
+            <p>A <code>LongDiscriminator</code> discriminates <code>Longs</code>.  With Java's
+            auto-boxing feature, it doesn't matter whether <code>Long</code> objects or
+            <code>long</code> values are present; this Discriminator will discriminate them.  It
+            discriminates its input by discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{0L, -1280L, 1234567890123456789L, 56L, -1L, 67L, 56L, -1280L, 56L, -56L}</li>
+            </ul>
+            <p>... a <code>LongDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{0L}</li>
+                <li>{1234567890123456789L}</li>
+                <li>{-1L}</li>
+                <li>{67L}</li>
+                <li>{-56L}</li>
+                <li>{-1280L, -1280L}</li>
+                <li>{56L, 56L, 56L}</li>
+            </ul>
+        </section>
+    </body>
+</document>

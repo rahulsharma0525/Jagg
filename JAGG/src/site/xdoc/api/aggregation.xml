@@ -1,0 +1,106 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>API - Aggregation Class</title>
+    </properties>
+    <body>
+        <section id="entryPoint" name="Entry Point">
+            <p>The "Aggregation" class is the entry point for a developer attempting to present a
+            view of raw data in an application.  It defines a static inner class "Builder" that
+            follows the Builder Pattern.  This <code>Builder</code> class builds an
+            <code>Aggregation</code> object that can be used to perform aggregate operations.</p>
+        </section>
+        <section id="builder" name="Builder Class">
+            <p>The "Builder" class builds <code>Aggregation</code> objects.  It has many methods
+            that can be used to control how the resultant Aggregation object behaves.</p>
+            <ul>
+                <li><code>setAggregators(List&lt;Aggregator&gt; aggregators)</code> - This method
+                    is required, or <code>build()</code> will throw an Exception.  This method
+                    supplies all <a href="../aggs/aggregator.html">Aggregators</a> to be used in
+                    the aggregation operation.  Create Aggregators by instantiating them directly,
+                    or by using the <code>Aggregator</code> class's factory method for creating
+                    them using <em>aggregagtor specification strings</em>:
+                    <ul>
+                        <li><code>Aggregator agg1 = new SumAggregator("qty");</code></li>
+                        <li><code>Aggregator agg2 = Aggregator.getAggregator("Avg(qty)");</code></li>
+                    </ul>
+                </li>
+                <li><code>setProperties(List&lt;String&gt; properties)</code> - This method is
+                    optional.  It is used to supply a list of "group by" properties that will be
+                    used to calculate multiple aggregate results.  If this method is not called,
+                    then the only way that the resultant Aggregation object can be used is with its
+                    "groupByComparable" method, which differentiates <code>Comparable</code>
+                    objects according to their <code>compare</code> methods.  To specify not to use
+                    any properties at all, supply an empty List here and then call "groupBy" on the
+                    resultant Aggregation object.</li>
+                <li><code>setParallelism(int parallelism)</code> - This method is optional.  It is
+                    used to specify a desired degree of parallelism to be used during the
+                    calculation of aggregate results.  jAgg will not use more Threads than there
+                    are CPUs available on the machine.  If not called, then jAgg defaults to 1 (no
+                    parallelism).</li>
+                <li><code>setUseMsd(boolean useMsd)</code> - This method is optional.  Normally,
+                    jAgg sorts a copy of the supplied object values list, to "line up" all objects
+                    with equivalent properties.  An alternative method is to use
+                    <a href="../msd/msd.html">Multiset Discrimination</a> to get object values to
+                    "line up" with equivalent properties.  Multiset discrimination is generally
+                    faster than sorting, but the results will not be in sorted order.  This
+                    defaults to <code>false</code> (don't use Multiset Discrimination, just use
+                    sorting) when not called.</li>
+                <li><code>setRollup(List&lt;Integer&gt; rollup)</code> - This method is optional.
+                    When this is called, jAgg will perform
+                    <a href="../super/rollups.html">rollup</a> super-aggregation on the properties
+                    specified by the integer contents of the list.  These integer references are
+                    0-based indexes into the original list of properties specified through
+                    <code>setProperties</code>.</li>
+                <li><code>setRollups(List&lt;List&lt;Integer&gt;&gt; rollups)</code> - This method
+                    is optional.  When this is called, jAgg will perform multiple
+                    <a href="../super/rollups.html">rollup</a> super-aggregation operations on the
+                    sets of rollups specified.  Each supplied list is a separate rollup
+                    specification, each containing 0-based indexes into the original list of
+                    properties specified through <code>setProperties</code>.</li>
+                <li><code>setCube(List&lt;Integer&gt; cube)</code> - This method is optional.  When
+                    this is called, jAgg will perform <a href="../super/cube.html">cube</a>
+                    super-aggregation on the properties specified by the integer contents of the
+                    list.  These integer references are 0-based indexes into the original list of
+                    properties specified through <code>setProperties</code>.</li>
+                <li><code>setGroupingSets(List&lt;List&lt;Integer&gt;&gt; groupingSets)</code> -
+                    This method is optional.  When this is called, jAgg will perform all
+                    super-aggregate operations specified with the given grouping sets, and no more.
+                    Each sub-list specifies a separate grouping set, and it contains 0-based
+                    indexes into the original list of properties specified through
+                    <code>setProperties</code>.</li>
+                <li><code>build()</code> - This method builds an <code>Aggregation</code> object
+                    that can be used to perform the actual aggregate operations.  This method
+                    should be called last, after all of the desired "setter" methods above have
+                    been called.</li>
+            </ul>
+            <p>Each setter method above returns the same Builder object, so that calls may be
+            chained, e.g.</p>
+<source>
+Aggregation agg = new Aggregation.Builder().setAggregators(aggList).setProperties(propsList).build();
+</source>
+        </section>
+        <section id="aggregation" name="Aggregation Class">
+            <p>The "Aggregation" object is responsible for performing all aggregate operations.  It
+            has two methods that perform the actual aggregation.</p>
+            <ul>
+                <li><code>&lt;T extends Comparable&lt;? super T&gt;&gt; groupByComparable(List&lt;T&gt; values)</code>
+                    - When the Builder did NOT supply a List of properties, then this method is the
+                    only possible method to call.  The Aggregation object "lines up" all objects
+                    using <code>Collections.sort</code>, relying on the fact that all of the value
+                    objects are <code>Comparable</code>.</li>
+                <li><code>&lt;T&gt; groupBy(List&lt;T&gt; values)</code> - If a list of properties
+                    was supplied, then this method can be called.  Here, the values objects need
+                    not be <code>Comparable</code>.  The Aggregation object "lines up" all objects
+                    using the <code>Collections.sort</code> overloading that takes a
+                    <code>Comparator</code>.  jAgg supplies its own
+                    <code>PropertiesComparator</code>, which compares the value objects based on
+                    the list of properties.  Alternatively, Multiset Discrimination can be used to
+                    accomplish this task.</li>
+            </ul>
+            <p>Both methods return a <code>List</code> of
+            <a href="aggregate_value.html">AggregateValues</a>, which contain the completed
+            aggregate results.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,41 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>LinearRegressionAggregator</title>
+    </properties>
+    <body>
+        <section id="linearRegression" name="LinearRegressionAggregator">
+            <p>A <code>LinearRegressionAggregator</code> is an Aggregator that performs a linear
+            regression analysis of two numeric values, returning several results encapsulated in a
+            <code>LinearRegressionStats</code> object.  If no values were encountered, then all
+            linear regression stat values are <code>NaN</code>, except for the count statistic,
+            which is zero.  The <code>LinearRegressionStats</code> object contains data for the
+            best fit line slope and y-intercept, the count of all pairs of values where both values
+            are not <code>null</code>, the r-squared component, the correlation, and the averages
+            of both properties.  While this Aggregator does use floating-point calculations, it
+            does not override the <code>terminateDoubleDouble</code> method.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>LinearRegressionAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new LinearRegressionAggregator("propertyOne", "propertyTwo");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("LinearRegression(propertyOne, propertyTwo)");</code></li>
+            </ul>
+            <p>The values returned by both properties of the object must be numeric.</p>
+            <p>The following methods are available in the <code>LinearRegressionStats</code> object
+            to retrieve the linear regression values.  All of them return a <code>double</code>,
+            except for <code>getCount()</code>, which returns a <code>long</code>.</p>
+            <ul>
+                <li><code>getLineSlope()</code> - Return the slope of the best fit line.</li>
+                <li><code>getLineIntercept()</code> - Return the y-intercept of the best fit line.</li>
+                <li><code>getCount()</code> - Return the count of all pairs of values where both
+                    values were not <code>null</code>, and thus were able to be used.</li>
+                <li><code>getRSquared()</code> - Return the r-squared "goodness of fit", or the
+                    "coefficient of determination".</li>
+                <li><code>getCorrelation()</code> - Return the correlation value.</li>
+                <li><code>getAvg1()</code> - Return the average value of the first property.</li>
+                <li><code>getAvg2()</code> - Return the average value of the second property.</li>
+            </ul>
+        </section>
+    </body>
+</document>

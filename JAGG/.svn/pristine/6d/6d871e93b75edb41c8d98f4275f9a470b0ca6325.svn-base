@@ -1,0 +1,44 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Installation</title>
+    </properties>
+    <body>
+        <section id="download" name="Download">
+            <p>Download the latest release version of the <a href="http://jagg.sourceforge.net">jAgg</a>
+                library from <a href="http://sourceforge.net/project/showfiles.php?group_id=369830">SourceForge.net</a>.
+            </p>
+        </section>
+        <section id="installation" name="Installation">
+            <p>To use the jAgg library, place the <strong><code>jagg-core</code></strong> jar in
+                your classpath.
+            </p>
+            <p>If you are using Maven 2+, then you may place the following dependency in your pom.xml.
+                Since 0.6.0, jAgg has been available in the Maven 2 Central Repository.</p>
+<source>
+&lt;dependency&gt;
+    &lt;groupId&gt;net.sf.jagg&lt;/groupId&gt;
+    &lt;artifactId&gt;jagg-core&lt;/artifactId&gt;
+    &lt;version&gt;0.7.1&lt;/version&gt;
+&lt;/dependency&gt;
+</source>
+            <p>The jAgg library does not depend on any third-party libraries, but it does rely on
+                JUnit 4.8.2 for JUnit test cases when building through Maven.
+            </p>
+        </section>
+        <section id="buildingFromSource" name="Building from source">
+            <p>It is possible to build jAgg directly from its source code, if the latest unreleased
+                changes are needed.  Use a Subversion client to get the source code and
+                <a href="http://maven.apache.org/">Apache Maven</a> to build it.  Here are the steps:
+            </p>
+            <ol>
+                <li>Get the latest jAgg source code from Sourceforge Subversion using the following command:
+                    <source>svn co https://jagg.svn.sourceforge.net/svnroot/jagg/trunk jagg</source>
+                </li>
+                <li>Run the following Maven command to build jAgg and install it into the local repository:
+                    <source>mvn clean install</source>
+                </li>
+            </ol>
+        </section>
+    </body>
+</document>

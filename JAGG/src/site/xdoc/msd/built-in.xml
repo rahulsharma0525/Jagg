@@ -1,0 +1,85 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg Built-In Discriminators</title>
+    </properties>
+    <body>
+        <section id="builtIn" name="Built-In Discriminators">
+            <p>The "msd" package contains the “Discriminator” interface plus many built-in
+                Discriminators.  The developer will usually not need to reference Discriminators
+                directly.
+            </p>
+            <p>Here is a list of the 21 built-in Discriminators:</p>
+            <ul>
+                <li><strong><a href="array.html">ArrayDiscriminator</a></strong> – Discriminates
+                    lists of arrays.</li>
+                <li><strong><a href="big_decimal.html">BigDecimalDiscriminator</a></strong> -
+                    Discriminates lists of <code>BigDecimals</code>.</li>
+                <li><strong><a href="big_integer.html">BigIntegerDiscriminator</a></strong> -
+                    Discriminates lists of <code>BigIntegers</code>.</li>
+                <li><strong><a href="boolean.html">BooleanDiscriminator</a></strong> -
+                    Discriminates lists of <code>Boolean</code>.</li>
+                <li><strong><a href="byte.html">ByteDiscriminator</a></strong> -
+                    Discriminates lists of <code>Bytes</code>.</li>
+                <li><strong><a href="calendar.html">CalendarDiscriminator</a></strong> -
+                    Discriminates lists of <code>Calendars</code>.</li>
+                <li><strong><a href="character.html">CharacterDiscriminator</a></strong> -
+                    Discriminates lists of <code>Characters</code>.</li>
+                <li><strong><a href="char_sequence.html">CharSequenceDiscriminator</a></strong> -
+                    Discriminates lists of <code>CharSequences</code>, which include
+                    <code>Strings</code>, <code>StringBuffers</code>, and
+                    <code>StringBuilders</code>.</li>
+                <li><strong><a href="class.html">ClassDiscriminator</a></strong> -
+                    Discriminates lists of objects based on their class names.</li>
+                <li><strong><a href="collection.html">CollectionDiscriminator</a></strong> -
+                    Discriminates lists of <code>Collections</code>.</li>
+                <li><strong><a href="date.html">DateDiscriminator</a></strong> -
+                    Discriminates lists of <code>Dates</code>.</li>
+                <li><strong><a href="discriminable.html">DiscriminableDiscriminator</a></strong> -
+                    Discriminates lists of objects that implement the <code>Discriminable</code>
+                    interface.  This is used for custom user objects that are not associated with a
+                    built-in Discriminator.</li>
+                <li><strong><a href="double.html">DoubleDiscriminator</a></strong> -
+                    Discriminates lists of <code>Doubles</code>.</li>
+                <li><strong><a href="enum.html">EnumDiscriminator</a></strong> -
+                    Discriminates lists of <code>Enums</code>.</li>
+                <li><strong><a href="float.html">FloatDiscriminator</a></strong> -
+                    Discriminates lists of <code>Floats</code>.</li>
+                <li><strong><a href="integer.html">IntegerDiscriminator</a></strong> -
+                    Discriminates lists of <code>Integers</code>.</li>
+                <li><strong><a href="long.html">LongDiscriminator</a></strong> -
+                    Discriminates lists of <code>Longs</code>.</li>
+                <li><strong><a href="null.html">NullDiscriminator</a></strong> -
+                    Discriminates lists of any objects by removing <code>nulls</code> into their
+                    own equivalence class before deferring to another Discriminator.</li>
+                <li><strong><a href="properties.html">PropertiesDiscriminator</a></strong> -
+                    Discriminates lists of any object based on a passed-in list of property names.</li>
+                <li><strong><a href="random_access_list.html">RandomAccessListDiscriminator</a></strong> -
+                    Discriminates lists of <code>Lists</code> that implement
+                    <code>RandomAccess</code>, such as <code>ArrayList</code>.</li>
+                <li><strong><a href="short.html">ShortDiscriminator</a></strong> -
+                    Discriminates lists of <code>Shorts</code>.</li>
+            </ul>
+        </section>
+        <section id="usage" name="Usage">
+            <p>When multiset discrimination is used, jAgg uses a
+            <code>PropertiesDiscriminator</code> to "line up" all of the original list of values
+            for the purposes of aggregate calculation.  However, each property will in turn need to
+            be discriminated.  There is a Discriminator for all of the built-in types that are most
+            likely to need discrimination.  However, custom object types would need to be
+            discriminated also.  To be discriminated, a custom object type needs to implement the
+            <a href="discriminable_interface.html">Discriminable</a> interface.  Then, a
+            <code>DiscriminableDiscriminator</code> gets the properties to discriminate, and defers
+            to a <code>PropertiesDiscriminator</code>.  Note that this is not necessary for the
+            type of objects being passed to the <code>groupBy</code> method; this is necessary for
+            object types that represent the property types of the objects being passed to the
+            <code>groupBy</code> method.</p>
+            <p>All built-in Discriminators subclass the abstract class
+            <code>AbstractDiscriminator</code>.  Some built-in Discriminators subclass
+            <code>ChainedDiscriminator</code>, which extends <code>AbstractDiscriminator</code>,
+            some built-in Discriminators subclass <code>PortionDiscriminator</code>, which extends
+            <code>AbstractDiscriminator</code>, and other built-in Discriminators subclass
+            <code>AbstractDiscriminator</code> directly.</p>
+        </section>
+    </body>
+</document>

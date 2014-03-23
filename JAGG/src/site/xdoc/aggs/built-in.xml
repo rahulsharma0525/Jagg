@@ -1,0 +1,100 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg Built-In Aggregators</title>
+    </properties>
+    <body>
+        <section id="builtIn" name="Built-In Aggregators">
+            <p>The jagg package contains the “Aggregations”, “Aggregator”, and “AggregateValue” classes,
+                plus many built-in Aggregators.  The developer should reference Aggregators in their
+                aggregator specification strings without the “Aggregator” suffix, e.g. “Avg(property)”.
+            </p>
+            <p>Here is a list of the 20 built-in Aggregators:</p>
+            <ul>
+                <li><strong><a href="avg.html">AvgAggregator</a></strong> – Determines the average of numeric values, e.g.
+                    “Avg(testResult)”.  The aggregate value returned is a <code>Double</code>.</li>
+                <li><strong><a href="collect.html">CollectAggregator</a></strong> - Collects all values and places them into a
+                    <code>List</code>, e.g. "Collect(item)".  The aggregate value returned is a
+                    <code>List</code>.</li>
+                <li><strong><a href="concat.html">ConcatAggregator</a></strong> – Performs a concatenation of the values of a
+                    property, with an optional separator String, e.g. “Concat(testResult)” or
+                    “Concat(testResult, \”|\”)”.  The specified property should return something
+                    with a well-defined “toString” method.  The aggregate value returned is a
+                    <code>String</code>.</li>
+                <li><strong><a href="correlation.html">CorrelationAggregator</a></strong> – Performs an analysis of how well two
+                    numeric properties are correlated, ranging from -1 (perfectly anti-correlated)
+                    to 0 (uncorrelated) to 1 (perfectly correlated), e.g.
+                    “Correlation(prop1, prop2)”.  The aggregate value returned is a
+                    <code>Double</code>.</li>
+                <li><strong><a href="count.html">CountAggregator</a></strong> – Determines the count of all non-null
+                    occurrences of a property, or if the given property is “*” (pre-defined
+                    property <code>CountAggregator.COUNT_ALL</code>), a count of all records,
+                    regardless of the nullity of any property.  The aggregate value returned is a
+                    <code>Long</code>.</li>
+                <li><strong><a href="covariance.html">CovarianceAggregator</a></strong> – Determines the sample covariance of two
+                    numeric properties, e.g. “Covariance(prop1, prop2)”.  The aggregate value
+                    returned is a <code>Double</code>.</li>
+                <li><strong><a href="covariance_pop.html">CovariancePopAggregator</a></strong> – Determines the population covariance
+                    of two numeric properties, e.g. “CovariancePop(prop1, prop2)”.  The aggregate
+                    value returned is a <code>Double</code>.</li>
+                <li><strong><a href="geometric_mean.html">GeometricMeanAggregator</a></strong> – Determine the geometric mean of a
+                    numeric property, e.g. “GeometricMean(testResult)”.  The aggregate value
+                    returned is a <code>Double</code>.</li>
+                <li><strong><a href="harmonic_mean.html">HarmonicMeanAggregator</a></strong> – Determine the harmonic mean of a
+                    numeric property, e.g. “HarmonicMean(testResult)”.  The aggregate value
+                    returned is a <code>Double</code>.</li>
+                <li><strong><a href="linear_regression.html">LinearRegressionAggregator</a></strong> – Performs a linear regression
+                    analysis on two numeric properties, e.g. “LinearRegression(prop1, prop2)”.  The
+                    aggregate value returned is a <code>LinearRegressionStats</code>, which
+                    contains linear regression-related calculations, including the slope and
+                    y-intercept of the best-fit line and other linear regression-related stats.</li>
+                <li><strong><a href="max.html">MaxAggregator</a></strong> – Determines the maximum value of a property
+                    that is <code>Comparable</code>, e.g. “Max(testResult)”.  The aggregate value
+                    returned is a <code>Comparable</code>.</li>
+                <li><strong><a href="min.html">MinAggregator</a></strong> – Determines the minimum value of a property
+                    that is <code>Comparable</code>, e.g. “Min(testResult)”.  The aggregate value
+                    returned is a <code>Comparable</code>.</li>
+                <li><strong><a href="mode.html">ModeAggregator</a></strong> - Determines the statistical mode of a property
+                    that is <code>Comparable</code>, e.g. "Mode(testResult)".  The aggregate value
+                    returned is a <code>Comparable</code>.</li>
+                <li><strong><a href="percentile.html">PercentileAggregator</a></strong> – Determines the <em>x</em>th percentile
+                    (in decimal form) of a numeric property, e.g. for median,
+                    “Percentile(0.5, testResult)”.  The aggregate value returned is a
+                    <code>Double</code>.</li>
+                <li><strong><a href="product.html">ProductAggregator</a></strong> – Determines the product of numeric values
+                    of a property, e.g. “Product(testResult)”.  The aggregate value returned is a
+                    <code>Double</code>.</li>
+                <li><strong><a href="stddev.html">StdDevAggregator</a></strong> – Determines the sample standard deviation of
+                    a numeric property, e.g. “StdDev(testResult)”.  The aggregate value returned is
+                    a <code>Double</code>.</li>
+                <li><strong><a href="stddev_pop.html">StdDevPopAggregator</a></strong> – Determines the population standard
+                    deviation of a numeric property, e.g. “StdDevPop(testResult)”.  The aggregate
+                    value returned is a <code>Double</code>.</li>
+                <li><strong><a href="sum.html">SumAggregator</a></strong> – Determines the sum of numeric values of a
+                    property, e.g. “Sum(testResult)”.  The aggregate value returned is a
+                    <code>Double</code>.</li>
+                <li><strong><a href="variance.html">VarianceAggregator</a></strong> – Determines the sample variance of a
+                    numeric property, e.g. “Variance(testResult)”.  The aggregate value returned is
+                    a <code>Double</code>.</li>
+                <li><strong><a href="variance_pop.html">VariancePopAggregator</a></strong> – Determines the population variance of
+                    a numeric property, e.g. “VariancePop(testResult)”.  The aggregate value
+                    returned is a <code>Double</code>.</li>
+            </ul>
+        </section>
+        <section id="multipleProps" name="Multiple Properties">
+            <p>Some Aggregators work on more than one property of an Object.  The abstract classes
+            "TwoPropAggregator" and "MultiPropAggregator" support this need.  They support two
+            properties and many properties, respectively.</p>
+            <p>The following built-in Aggregators are also TwoPropAggregators:</p>
+            <ul>
+                <li>CorrelationAggregator</li>
+                <li>CovarianceAggregator</li>
+                <li>CovariancePopAggregator</li>
+                <li>LinearRegressionAggregator</li>
+                <li>PercentileAggregator</li>
+            </ul>
+            <p>No built-in Aggregators are also MultiPropAggregators.</p>
+            <p>The rest of the built-in Aggregators subclass Aggregator directly.</p>
+        </section>
+    </body>
+</document>

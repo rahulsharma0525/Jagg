@@ -1,0 +1,88 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>API - Aggregations Class</title>
+    </properties>
+    <body>
+        <section id="aggregations" name="Aggregations Class">
+            <p>The “Aggregations” utility class is a convenience entry point for a developer
+                attempting to present a view of raw data in an application.  It has six public,
+                static, overloaded methods called “groupBy”.  All methods take a List of Ts as a
+                parameter.  All of these methods create an <code>Aggregation</code> object using
+                the Builder, then defer to that Aggregation object for aggregate calculation.  If
+                super-aggregates such as rollups or cubes are desired, then one must use the
+                <a href="aggregation.html">Aggregation</a> object (and Builder) directly.
+            </p>
+            <source>
+public static &lt;T extends Comparable&lt;? super T&gt;&gt; List&lt;AggregateValue&lt;T&gt;&gt;
+   groupBy(List&lt;T&gt; values, List&lt;Aggregator&gt; aggregators)
+
+public static &lt;T extends Comparable&lt;? super T&gt;&gt; List&lt;AggregateValue&lt;T&gt;&gt;
+   groupBy(List&lt;T&gt; values, List&lt;Aggregator&gt; aggregators, int parallelism)
+
+public static &lt;T&gt; List&lt;AggregateValue&lt;T&gt;&gt;
+   groupBy(List&lt;T&gt; values, List&lt;String&gt; properties, List&lt;Aggregator&gt; aggregators)
+
+public static &lt;T&gt; List&lt;AggregateValue&lt;T&gt;&gt;
+   groupBy(List&lt;T&gt; values, List&lt;String&gt; properties, List&lt;Aggregator&gt; aggregators, boolean useMsd)
+
+public static &lt;T&gt; List&lt;AggregateValue&lt;T&gt;&gt;
+   groupBy(List&lt;T&gt; values, List&lt;String&gt; properties, List&lt;Aggregator&gt; aggregators, int parallelism)
+
+public static &lt;T&gt; List&lt;AggregateValue&lt;T&gt;&gt;
+   groupBy(List&lt;T&gt; values, List&lt;String&gt; properties, List&lt;Aggregator&gt; aggregators, int parallelism, boolean useMsd)
+            </source>
+            <p>The first two methods operate on a List of Comparables.  This will group together all
+                Objects that compare equal using that Object's "compareTo" method.
+            </p>
+            <p>The last four methods operate on any List of Objects.  The extra parameter "properties"
+                is a List of property Strings.
+            </p>
+            <p>The developer has the option of specifying a degree of parallelism to speed up the
+                processing by taking advantage of multiple processors that may be available on the host.
+                Because of the expected CPU-intensive nature of the required calculations, jAgg
+                won’t spawn more Threads than there are processors on the host.
+            </p>
+            <p>On the "groupBy" methods that take a List of property Strings, the developer has the option
+                using <a href="../msd/msd.html">Multiset Discrimination</a> instead of sorting to group items with
+                identical properties.This option defaults to false, i.e. always sort the items.  If for any
+                reason Multiset Discrimination fails, the it falls back to sorting.
+            </p>
+            <p>Each “groupBy” method returns a List of AggregateValue objects.  The AggregateValue class,
+                parameterized with type T, contains an object of type T and maintains a HashMap of
+                aggregate values associated with each object of type T.
+            </p>
+        </section>
+        <section id="properties" name="Properties">
+            <p>The developer has the choice of “group by” properties to use.  Here, “properties” is
+                used in a bean-like context, in that property “xyz” corresponds to a “getXyz”
+                method (or an "isXyz" method) on an object of type T.  A “property” may also
+                specify an explicit method call with parameters that are Numbers, Strings, or
+                Enums.  The pre-defined property “.” indicates that the values to aggregate are
+                represented by the List objects themselves.  This allows aggregation of simple
+                objects, like Numbers and Strings.  Here are the choices the developer has in how
+                to specify “group by” properties:
+            </p>
+            <ul>
+                <li>If the type parameter T represents a class that is Comparable, then Aggregations will
+                    group together all values that compare as equal, according to T’s “compareTo” method.
+                </li>
+                <li>Instead, the developer can supply a List of Strings representing the properties of
+                    “T” to consider for grouping purposes.  This corresponds directly to SQL’s “group by”
+                    clause.
+                </li>
+            </ul>
+        </section>
+        <section id="aggregators" name="Aggregators">
+            <p>The developer supplies a List of Aggregators that specify which aggregate operations are to
+                be performed, on which properties.  For example:
+            </p>
+            <source>
+List&lt;Aggregator&gt; aggregators = new ArrayList&lt;Aggregator&gt;();
+aggregators.add(new SumAggregator(“numBillableEvents”));
+aggregators.add(new AvgAggregator(“totalAmt”));
+aggregators.add(new StdDevAggregator(“getValue(MyEnum.MY_VALUE)”));
+            </source>
+        </section>
+    </body>
+</document>

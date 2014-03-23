@@ -1,0 +1,32 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>CalendarDiscriminator</title>
+    </properties>
+    <body>
+        <section id="calendar" name="CalendarDiscriminator">
+            <p>A <code>CalendarDiscriminator</code> discriminates <code>Calendars</code>, from the
+            java.util package.  It discriminates its input by calling
+            <code>getTimeInMillis()</code>, then employing a <code>LongDiscriminator</code> on the
+            resultant <code>long</code> value.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{01-JAN-2012 00:00:00, 01-JAN-2012 12:00:00, 01-NOV-2012 15:33:14, 11-JAN-2012 00:00:00,
+                     01-JAN-2012 00:00:00, 04-JUL-1776 00:00:00, 20-JUL-1969 19:56:00, 01-JAN-2012 00:00:00,
+                     01-NOV-2012 15:33:14, 01-NOV-2012 15:33:13}</li>
+            </ul>
+            <p>... a <code>CalendarDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{01-JAN-2012 12:00:00}</li>
+                <li>{11-JAN-2012 00:00:00}</li>
+                <li>{04-JUL-1776 00:00:00}</li>
+                <li>{20-JUL-1969 19:56:00}</li>
+                <li>{01-NOV-2012 15:33:13}</li>
+                <li>{01-JAN-2012 00:00:00, 01-JAN-2012 00:00:00, 01-JAN-2012 00:00:00}</li>
+                <li>{01-NOV-2012 15:33:14, 01-NOV-2012 15:33:14}</li>
+            </ul>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,30 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>IntegerDiscriminator</title>
+    </properties>
+    <body>
+        <section id="integer" name="IntegerDiscriminator">
+            <p>An <code>IntegerDiscriminator</code> discriminates <code>Integers</code>.  With
+            Java's auto-boxing feature, it doesn't matter whether <code>Integer</code> objects or
+            <code>int</code> values are present; this Discriminator will discriminate them.  It
+            discriminates its input by discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{0, -1280, 8675309, 56, -1, 67, 56, -1280, 56, -56}</li>
+            </ul>
+            <p>... an <code>IntegerDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{0}</li>
+                <li>{8675309}</li>
+                <li>{-1}</li>
+                <li>{67}</li>
+                <li>{-56}</li>
+                <li>{-1280, -1280}</li>
+                <li>{56, 56, 56}</li>
+            </ul>
+        </section>
+    </body>
+</document>

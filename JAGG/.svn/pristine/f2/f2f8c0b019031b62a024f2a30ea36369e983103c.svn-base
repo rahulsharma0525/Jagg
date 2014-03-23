@@ -1,0 +1,35 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>EnumDiscriminator</title>
+    </properties>
+    <body>
+        <section id="enum" name="EnumDiscriminator">
+            <p>An <code>EnumDiscriminator</code> discriminates any <code>Enum</code> objects.  It
+            discriminates objects by calling the <code>ordinal()</code> method on the enum values.
+            Then it delegates to an <code>IntegerDiscriminator</code> to discriminate the ordinal
+            values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the enum class...</p>
+            <source>
+public enum Suit
+{
+    CLUBS, DIAMONDS, SPADES, HEARTS;
+}
+            </source>
+            <p>... and the input...</p>
+            <ul>
+                <li>{Suit.DIAMONDS, Suit.CLUBS, Suit.CLUBS, Suit.CLUBS,
+                     Suit.SPADES, Suit.HEARTS, Suit.SPADES, Suit.DIAMONDS}</li>
+            </ul>
+            <p>... an <code>EnumDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{Suit.HEARTS}</li>
+                <li>{Suit.DIAMONDS, Suit.DIAMONDS}</li>
+                <li>{Suit.CLUBS, Suit.CLUBS, Suit.CLUBS}</li>
+                <li>{Suit.SPADES, Suit.SPADES}</li>
+            </ul>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,25 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>MinAggregator</title>
+    </properties>
+    <body>
+        <section id="min" name="MinAggregator">
+            <p>A <code>MinAggregator</code> is an Aggregator that determines and returns the
+            minimum of the property values.  If no values were encountered, then the minimum is
+            <code>null</code>.  This Aggregator does not use floating-point calculations, so it
+            does not override the <code>terminateDoubleDouble</code> method.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>MinAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new MinAggregator("property");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Min(property)");</code></li>
+            </ul>
+            <p>The values returned by the property of the object must be <code>Comparable</code>.
+            This includes, but is not limited to, all numeric values and Strings.</p>
+            <p>The value's "compareTo" method may be called to establish which object is the
+            minimum.</p>
+        </section>
+    </body>
+</document>

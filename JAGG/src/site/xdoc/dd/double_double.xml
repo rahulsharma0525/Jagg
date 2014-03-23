@@ -1,0 +1,121 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>DoubleDouble Precision</title>
+    </properties>
+    <body>
+        <section id="floatingPoint" name="Floating Point Calculations">
+            <p>Most of jAgg's Aggregators perform calculations on numeric values.  These values are
+            generally represented as the Java built-in type <code>double</code>, which represents a
+            wide range of possible values.  However, many numbers cannot be represented exactly,
+            due to the binary representation of floating-point numbers.  Many numbers can only be
+            approximated, using the binary representation that is the closest possible value to the
+            number desired.</p>
+            <p>These approximations are usually insignificant, but they become problematic in a few
+            ways.  When an intermediate result is used to calculate the next result, usually in
+            iterations involving a large set of figures, the error resulting from the
+            approximations can become more signficant, i.e. floating-point errors are compounded.
+            In addition, numerical instabilities in normally sound mathematical algorithms can
+            render floating-point accuracy non-existent, such as when two nearly equal quantities
+            are subtracted.</p>
+            <p>However, because jAgg supports arbitrarily large datasets to aggregate, these
+            approximation errors can easily become significant.  This can manifest itself in an
+            answer that is "off" by a little bit.  E.g. the answer should be 2.18, but the printed
+            answer is 2.180000000000001.</p>
+            <p>Such errors can be minimized by using in-memory representations of numbers that have
+            a higher precision.  Java has two levels of precision for floating-point numbers,
+            <code>float</code> and <code>double</code>, with <code>double</code> having more
+            precision, and thus a far smaller approximation error.  Arbitrary-precision libraries
+            are available that can virtually eliminate these kinds of errors.  However, they can
+            suffer from large peformance penalties, especially when a high degree of precision is
+            desired.</p>
+        </section>
+        <section id="solution" name="DoubleDouble Solution">
+            <p>The solution that jAgg employs is to use "Double-Double" precision.  A
+            <code>DoubleDouble</code> is an object that consists of two <code>double</code>
+            instance variables - one of "high" significance, and one of "low" significance.
+            Normally, one <code>double</code> contains 52 bits in its "signficand", plus the
+            implicit "one", yielding 53 bits of precision.  In a <code>DoubleDouble</code>, the
+            "high" <code>double</code> represents the best <code>double</code> approximation to the
+            desired number.  To improve precision, the "low" <code>double</code> represents an
+            adjustment to the total value of the "high" number, with 54 additional bits of
+            precision (52 bits of the significand, plus its implicit "one" and the sign bit is also
+            used here), yielding a total of 107 bits of precision.  This greatly reduces, but does
+            not eliminate, the problem of binary approximation of real numbers. However, in testing,
+            this appears to be sufficient to yield highly accurate and precise <code>double</code>
+            results for aggregation tasks.</p>
+            <p>All <code>Aggregators</code> that use numeric calculations employ
+            <code>DoubleDoubles</code> behind the scenes to maintain a high level of precision and
+            to minimize floating-point errors in calculations.  Also, numerically stable algorithms
+            are utilized wherever needed to maintain precision.</p>
+            <p>Additionally, some numeric <code>Aggregators</code> use other
+            <code>Aggregator</code> results to calculate their own results.  Normally, the result
+            of a numeric <code>Aggregator</code> is a <code>double</code>, as a result of calling
+            <code>terminate</code>.  For some Aggregators to use other Aggregators in their
+            calculations, they call <code>terminateDoubleDouble</code>, an internally used method
+            that provides intermediate results at <code>DoubleDouble</code> precision.</p>
+        </section>
+        <section id="operations" name="Operations">
+            <p>The <code>DoubleDouble</code> class supplies many operations that represent
+            mathematical operations on the represented value.  Such operations can typically, but
+            not always, handle both a <code>double</code> and another <code>DoubleDouble</code>.
+            <code>DoubleDoubles</code> are not immutable; in fact, operations do not return
+            separate <code>DoubleDoubles</code> -- they modify their own object.  However, two
+            constants are defined in the class which are immutable, <code>NaN</code> and
+            <code>ZERO</code>.  (Any operations that would modify those constants' contents throw
+            <code>UnsupportedOperationExceptions</code>.)</p>
+            <p>Computational algorithms for <code>DoubleDouble</code> precision are based on
+            "Algorithms for Quad-Double Precision Floating Point Arithmetic" by Hida, Li, and
+            Bailey, 2000, Berkeley.</p>
+            <p>Here are the methods defined on the <code>DoubleDouble</code> class:</p>
+            <ul>
+                <li><code>DoubleDouble()</code> - Constructor with an initial value of zero.</li>
+                <li><code>DoubleDouble(double d)</code> - Constructor that takes a normal
+                    <code>double</code>.</li>
+                <li><code>DoubleDouble(double hi, double lo)</code> - Constructor that takes two
+                    <code>doubles</code>.  If the two values "overlap" in precision, then they are
+                    normalized, so that the "low" value is no longer overlapping bits of precision
+                    with the "high" value, e.g. (1, 0.125) => (1.125, 0).</li>
+                <li><code>DoubleDouble(DoubleDouble dd)</code> - A copy constructor.</li>
+                <li><code>reset()</code> - Sets this <code>DoubleDouble</code> equal to zero.</li>
+                <li><code>doubleValue()</code> - Returns the "high" <code>double</code>, which by
+                    itself is the best <code>double</code> approximation to this
+                    <code>DoubleDouble's</code> value.</li>
+                <li><code>getLow()</code> - Returns the "low" <code>double</code>, which is the
+                    "correction" applied to the "high" double to arrive at the overall more precise
+                    <code>DoubleDouble</code> value.</li>
+                <li><code>isNaN()</code> - Returns whether this <code>DoubleDouble</code>
+                    represents <code>NaN</code> - not a number.</li>
+                <li><code>addToSelf(DoubleDouble dd)</code> - Add another <code>DoubleDouble</code>
+                    to this one, modifying this value.</li>
+                <li><code>addToSelf(double d)</code> - Add a <code>double</code> to this value,
+                    modifying this value.</li>
+                <li><code>subtractFromSelf(DoubleDouble dd)</code> - Subtract another
+                    <code>DoubleDouble</code> from this one, modifying this value.</li>
+                <li><code>subtractFromSelf(double d)</code> - Subtract a <code>double</code> from
+                    this value, modifying this value.</li>
+                <li><code>negateSelf()</code> - Negates this value.  Both the "high" and "low"
+                    values are negated.</li>
+                <li><code>multiplySelfBy(DoubleDouble dd)</code> - Multiply this value by another
+                    <code>DoubleDouble</code>, modifying this value.</li>
+                <li><code>multiplySelfBy(double d)</code> - Multiply this value by a
+                    <code>double</code>, modifying this value.</li>
+                <li><code>squareSelf()</code> - Multiply this value by itself, modifying this
+                    value.</li>
+                <li><code>divideSelfBy(DoubleDouble dd)</code> - Divide this value by another
+                    <code>DoubleDouble</code>, modifying this value.</li>
+                <li><code>divideSelfBy(double d)</code> - Divide this value by a
+                    <code>double</code>, modifying this value.</li>
+                <li><code>sqrtSelf()</code> - Take the square root of this value, modifying this
+                    value.</li>
+                <li><code>powSelf(long exponent)</code> - Raise this value to an integer power,
+                    modifying this value.</li>
+                <li><code>nthRootSelf(long n)</code> - Take the <em>n</em>th root of this value,
+                    modifying this value.</li>
+                <li><code>compareTo(DoubleDouble other)</code> - Compare to another
+                    <code>DoubleDouble</code>, to determine less than, equal to, or greater than.
+                    (<code>DoubleDoubles</code> are <code>Comparable</code> to each other.)</li>
+            </ul>
+        </section>
+    </body>
+</document>

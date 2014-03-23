@@ -1,0 +1,27 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>GeometricMeanAggregator</title>
+    </properties>
+    <body>
+        <section id="geometricMean" name="GeometricMeanAggregator">
+            <p>A <code>GeometricMeanAggregator</code> is an Aggregator that calculates the
+            geometric mean of numeric values, returning the geometric mean as a
+            <code>Double</code>.  If no values were encountered, then the returned geometric mean
+            is <code>Double.NaN</code>.  This Aggregator overrides the
+            <code>terminateDoubleDouble</code> method, so that the geometric mean is also available
+            as a <a href="../dd/double_double.html">DoubleDouble</a>.  This allows the geometric
+            mean to be used by other Aggregators as a high-precision <code>DoubleDouble</code>.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>GeometricMeanAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new GeometricMeanAggregator("property");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("GeometricMean(property)");</code></li>
+            </ul>
+            <p>The values returned by the property of the object must be numeric.</p>
+            <p>The geometric mean is calculated by taking the <em>n</em>-th root of the product of
+            all values.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,30 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>ConcatAggregator</title>
+    </properties>
+    <body>
+        <section id="concat" name="ConcatAggregator">
+            <p>A <code>ConcatAggregator</code> is an Aggregator that concatenates string values by
+            calling <code>toString</code> on the values, and appending the string values to an
+            internal <code>StringBuilder</code>.  It returns its value as a <code>String</code>.
+            Optionally, a separator string may be specified to delimit string values.  If no values
+            were encountered, then the returned string is empty ("").  This Aggregator does not use
+            floating-point calculations, so it does not override the
+            <code>terminateDoubleDouble</code> method.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>ConcatAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new ConcatAggregator("property");</code></li>
+                <li><code>Aggregator agg = new ConcatAggregator("property", ",");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Concat(property)");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Concat(property, \",\")");</code></li>
+            </ul>
+            <p>There is no restriction on the type of property values expected.  Any value found
+            will have its "toString()" method called, to append the string to the result.</p>
+            <p>The string is built by appending the property value strings in the order in which
+            jAgg finds them in the original list of values.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,64 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>API - Aggregate Value Class</title>
+    </properties>
+    <body>
+        <section id="aggregateValue" name="AggregateValue Class">
+            <p>The "AggregateValue" class is a value object that holds the result of any and all
+            aggregate operations.  Category values and aggregate values are available using the
+            methods of this class.  This class contains a reference to one of the original data
+            objects, to supply category/property data.  Additional data is also available for
+            identifying "all values" categories if super aggregation is used, i.e. grouping sets,
+            rollups, or cubes.  Here are the methods of the <code>AggregateValue</code> class.</p>
+            <ul>
+                <li><code>getAggregateValue(Aggregator agg)</code> - Return the aggregate value as
+                    calculated by the given <code>Aggregator</code>.  Use an original Aggregator
+                    object that was supplied to the Builder method.</li>
+                <li><code>getAggregateValue(int index)</code> - Return the aggregate value as
+                    calculated by the <code>Aggregator</code> referenced by the given 0-based
+                    index.  This index references the original list of Aggregators supplied to the
+                    Builder object.</li>
+                <li><code>getObject()</code> - This method retrieves the property value associated
+                    with this grouping.  jAgg uses the first object in the group that it encounters
+                    when calculating aggregate values.  This method is not recommended if
+                    super-aggregation is used.  In super-aggregation, such as rollups or cubes,
+                    some properties may represent "all values", so the original value for the
+                    property may be invalid.  Returning the actual object used would allow the user
+                    to retrieve the original property value, would may be invalid for
+                    super-aggregation.  Use either of the overloaded <code>getPropertyValue</code>
+                    methods instead.  However, if <code>Aggregation.groupByComparable</code> was
+                    called, then this is the only way to retrieve "group by" property values.</li>
+                <li><code>getPropertyValue(String property)</code> - Retrieve the property value by
+                    name from the aggregate value.  If this <code>AggregateValue</code> represents
+                    "all values" for this property, then this will return <code>null</code> instead
+                    of the actual property value.</li>
+                <li><code>getPropertyValue(int index)</code> - Retrieve the property value by
+                    referencing the property with a 0-based index into the original list of
+                    properties supplied to the Builder object.  If no properties were supplied, and
+                    <code>groupByComparable</code> was called, then this method will always return
+                    <code>null</code>.  If this <code>AggregateValue</code> represents "all values"
+                    for this property, then this will return <code>null</code> instead of the
+                    actual property value.  If <code>Aggregation.groupByComparable</code> was
+                    called, then there are no properties to reference and this method returns
+                    <code>null</code>.</li>
+                <li><code>isGrouping(String propertyName)</code> - For AggregateValue objects that
+                    represent super-aggregate values, i.e. rollups or cubes, then this method
+                    determines whether the given property represents "all values".  For
+                    AggregateValue objects that represent normal aggregate values, no properties
+                    represent "all values" so this method returns <code>false</code>.</li>
+                <li><code>isGrouping(int index)</code> - Returns the same boolean value as the
+                    overloaded method above, but refers to properties with a 0-based index into the
+                    original list of properties supplied to the Builder.  If no properties were
+                    supplied, and <code>groupByComparable</code> was called, then this method will
+                    always return <code>false</code>.</li>
+                <li><code>getGroupingId(List&lt;?&gt; fields)</code> - Distinguishes different
+                    grouping sets that contain the given fields during super-aggregation.  Returns
+                    a distinct integer for each different grouping set, e.g. rollup or cube.  Each
+                    of the given fields may be String property names or 0-based integer references
+                    to the original List of properties supplied to the Builder.  For
+                    AggregateValues that represent normal aggregation, this always returns 0.</li>
+            </ul>
+        </section>
+    </body>
+</document>

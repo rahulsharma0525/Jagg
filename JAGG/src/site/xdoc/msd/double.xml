@@ -1,0 +1,31 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>DoubleDiscriminator</title>
+    </properties>
+    <body>
+        <section id="double" name="DoubleDiscriminator">
+            <p>A <code>DoubleDiscriminator</code> discriminates <code>Doubles</code>.  With Java's
+            auto-boxing feature, it doesn't matter whether <code>Double</code> objects or
+            <code>double</code> values are present; this Discriminator will discriminate them.  It
+            discriminates its input by discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{0.0, -12.8, 12.7, 0.56, -1.0, 67.67, 56.0, -12.8, 56.0, -0.56}</li>
+            </ul>
+            <p>... a <code>DoubleDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{0.0}</li>
+                <li>{12.7}</li>
+                <li>{0.56}</li>
+                <li>{-1.0}</li>
+                <li>{67.67}</li>
+                <li>{-0.56}</li>
+                <li>{-12.8, -12.8}</li>
+                <li>{56.0, 56.0}</li>
+            </ul>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,674 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Rollups - Super Aggregation</title>
+    </properties>
+    <body>
+        <section id="rollups" name="Rollups">
+            <p>One of the ways that jAgg supports super aggregation is by supporting rollups.
+            Normally, jAgg calculates aggregate values based on all "group by" properties specified
+            in the Builder object.  However, sometimes different levels of aggregation are desired.
+            For example, subtotals for each group of aggregate values can be desirable.</p>
+            <p>Once can simply call jAgg again, with less properties, to obtain the desired
+            subtotals, but that would mean a separate pass through the data for each level of super
+            aggregation.  With rollups, and super aggregation in general, jAgg reuses the
+            Aggregators that were used to calculate the original, normal aggregate values, in order
+            to calculate the new super aggregate values.</p>
+        </section>
+        <section id="understanding" name="Understanding Rollups">
+            <p>When rollups are specified, jAgg needs to know which properties by which to create
+            subtotals.  jAgg expects 0-based indices to specify which properties.  These indices
+            refer to the original list of property names that was supplied to the Builder object.
+            jAgg will create subtotals first at the last specified property, then it will roll up
+            those subtotals to the property specified before that last property, and so on, until
+            all rollup properties have been subtotaled.  Unlike cube, a rollup of <em>n</em>
+            properties produces only <em>n</em> extra grouping set combinations.</p>
+            <p>In this example, four property names were originally specified to jAgg.  Without
+            rollups, normal aggregation proceeds and here are the results:</p>
+            <source>
+List&lt;String&gt; properties = Arrays.asList("property1", "property2", "property3", "property4");
+List&lt;Aggregator&gt; aggs = Arrays.asList(Aggregator.getAggregator("Sum(value)"));
+Aggregation agg = new Aggregation.Builder()
+   .setProperties(properties)
+   .setAggregators(aggs)
+   .build();
+List&lt;AggregateValue&lt;TestRec&gt;&gt; aggValues = agg.groupBy(testRecords);
+            </source>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>true</td> <td>2</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td>  <td>false</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>true</td> <td>6</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td>  <td>green</td> <td>false</td> <td>10</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>true</td> <td>102</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>false</td> <td>103</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>true</td> <td>106</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>false</td> <td>110</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>true</td> <td>1002</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td>  <td>false</td> <td>1003</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>true</td> <td>1006</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td>  <td>green</td> <td>false</td> <td>1010</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>true</td> <td>1102</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>false</td> <td>1103</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>true</td> <td>1106</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>false</td> <td>1110</td>
+                </tr>
+            </table>
+            <p>Here are the new results when the following rollups are specified: {1, 2, 3},
+            corresponding to "property2", "property3", and "property4", respectively.</p>
+            <source>
+List&lt;String&gt; properties = Arrays.asList("property1", "property2", "property3", "property4");
+List&lt;Aggregator&gt; aggs = Arrays.asList(Aggregator.getAggregator("Sum(value)"));
+List&lt;Integer&gt; rollupProps = Arrays.asList(1, 2, 3);
+Aggregation agg = new Aggregation.Builder()
+   .setProperties(properties)
+   .setAggregators(aggs)
+   .setRollup(rollupProps)
+   .build();
+List&lt;AggregateValue&lt;TestRec&gt;&gt; aggValues = agg.groupBy(testRecords);
+            </source>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2, 3} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>true</td> <td>2</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td>  <td>false</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>true</td> <td>6</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td>  <td>green</td> <td>false</td> <td>10</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>true</td> <td>102</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>false</td> <td>103</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>true</td> <td>106</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>false</td> <td>110</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>true</td> <td>1002</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td>  <td>false</td> <td>1003</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>true</td> <td>1006</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td>  <td>green</td> <td>false</td> <td>1010</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>true</td> <td>1102</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>false</td> <td>1103</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>true</td> <td>1106</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>false</td> <td>1110</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>&nbsp;</td> <td>5</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>&nbsp;</td> <td>16</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>&nbsp;</td> <td>205</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>&nbsp;</td> <td>216</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>&nbsp;</td> <td>2005</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>&nbsp;</td> <td>2016</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>&nbsp;</td> <td>2205</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>&nbsp;</td> <td>2216</td>
+                </tr>
+                <!-- Grouping set {0, 1} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>21</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>421</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4021</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4421</td>
+                </tr>
+                <!-- Grouping set {0} -->
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>442</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>8442</td>
+                </tr>
+            </table>
+            <p>Subtotals are calculated at increasingly general levels.  Note here that the order
+            of the rollup properties specified is important, because the properties referenced last
+            will get rolled up before the properties referenced first.  Also, whenever a property
+            is rolled up, its value is <code>null</code>, meaning that the particular aggregate
+            value represents "all values" for this property.</p>
+            <p>Above, every property was subtotaled except for "property1", because "0" was not
+            specified.  Here is another example, including "property1".  Because all properties are
+            now specified, there is one <code>AggregateValue</code> where
+            <code>getPropertyValue</code> always returns <code>null</code>.  This is the grand
+            total.</p>
+            <source>
+List&lt;String&gt; properties = Arrays.asList("property1", "property2", "property3", "property4");
+List&lt;Aggregator&gt; aggs = Arrays.asList(Aggregator.getAggregator("Sum(value)"));
+List&lt;Integer&gt; rollupProps = Arrays.asList(0, 1, 2, 3);
+Aggregation agg = new Aggregation.Builder()
+   .setProperties(properties)
+   .setAggregators(aggs)
+   .setRollup(rollupProps)
+   .build();
+List&lt;AggregateValue&lt;TestRec&gt;&gt; aggValues = agg.groupBy(testRecords);
+            </source>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2, 3} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>true</td> <td>2</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td>  <td>false</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>true</td> <td>6</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td>  <td>green</td> <td>false</td> <td>10</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>true</td> <td>102</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>false</td> <td>103</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>true</td> <td>106</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>false</td> <td>110</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>true</td> <td>1002</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td>  <td>false</td> <td>1003</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>true</td> <td>1006</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td>  <td>green</td> <td>false</td> <td>1010</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>true</td> <td>1102</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>false</td> <td>1103</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>true</td> <td>1106</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>false</td> <td>1110</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>&nbsp;</td> <td>5</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>&nbsp;</td> <td>16</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>&nbsp;</td> <td>205</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>&nbsp;</td> <td>216</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>&nbsp;</td> <td>2005</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>&nbsp;</td> <td>2016</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>&nbsp;</td> <td>2205</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>&nbsp;</td> <td>2216</td>
+                </tr>
+                <!-- Grouping set {0, 1} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>21</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>421</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4021</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4421</td>
+                </tr>
+                <!-- Grouping set {0} -->
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>442</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>8442</td>
+                </tr>
+                <!-- Grouping set {} -->
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>8884</td>
+                </tr>
+            </table>
+        </section>
+        <section id="id" name="Identifying Grouping Sets">
+            <p>If a certain property represents "all values", then the result from
+            <code>getPropertyValue</code> for that property will be <code>null</code>.  But what if
+            <code>null</code> is the actual value being aggregated?  jAgg tells these cases apart
+            with the help of the methods <code>isGrouping()</code> and <code>getGroupingId</code>.</p>
+            <ul>
+                <li><code>isGrouping(int field)</code> - Determines whether the property referenced
+                by the given 0-based index represents "all values".  If true, then
+                <code>getPropertyValue(field)</code> returns <code>null</code> and this is a super
+                aggregate value.  If false, then <code>getPropertyValue(field)</code> can return
+                any value, including <code>null</code>, and this aggregate value does not represent
+                "all values" for this property.</li>
+                <li><code>isGrouping(String propertyName)</code> - Determines whether the given
+                property represents "all values".  If true, then
+                <code>getPropertyValue(field)</code> returns <code>null</code> and this is a super
+                aggregate value.  If false, then <code>getPropertyValue(field)</code> can return
+                any value, including <code>null</code>, and this aggregate value does not represent
+                "all values" for this property.</li>
+                <li><code>getGroupingId(List&lt;?&gt; fields)</code> - Creates a distinct integer
+                grouping set ID based on the referenced fields, which may be 0-based integer
+                references or property name strings, or both.  Every aggregate value that has the
+                same properties representing "all values" has the same integer ID.</li>
+            </ul>
+            <p>Here is the same example as above, but with the above method call results included.</p>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                    <td>isGrouping(0)</td> <td>isGrouping(1)</td> <td>isGrouping(2)</td> <td>isGrouping(3)</td>
+                    <td>getGroupingId({0, 1})</td> <td>getGroupingId({0, 1, 2, 3})</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2, 3} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>true</td> <td>2</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td>  <td>false</td> <td>3</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>true</td> <td>6</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td>  <td>green</td> <td>false</td> <td>10</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>true</td> <td>102</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>false</td> <td>103</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>true</td> <td>106</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>false</td> <td>110</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>true</td> <td>1002</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td>  <td>false</td> <td>1003</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>true</td> <td>1006</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td>  <td>green</td> <td>false</td> <td>1010</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>true</td> <td>1102</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>false</td> <td>1103</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>true</td> <td>1106</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>false</td> <td>1110</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>false</td>
+                    <td>0</td> <td>0</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>&nbsp;</td> <td>5</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>&nbsp;</td> <td>16</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>&nbsp;</td> <td>205</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>&nbsp;</td> <td>216</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>&nbsp;</td> <td>2005</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>&nbsp;</td> <td>2016</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>&nbsp;</td> <td>2205</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>&nbsp;</td> <td>2216</td>
+                    <td>false</td> <td>false</td> <td>false</td> <td>true</td>
+                    <td>0</td> <td>1</td>
+                </tr>
+                <!-- Grouping set {0, 1} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>21</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>421</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4021</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>4421</td>
+                    <td>false</td> <td>false</td> <td>true</td> <td>true</td>
+                    <td>0</td> <td>3</td>
+                </tr>
+                <!-- Grouping set {0} -->
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>442</td>
+                    <td>false</td> <td>true</td> <td>true</td> <td>true</td>
+                    <td>1</td> <td>7</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>8442</td>
+                    <td>false</td> <td>true</td> <td>true</td> <td>true</td>
+                    <td>1</td> <td>7</td>
+                </tr>
+                <!-- Grouping set {} -->
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>8884</td>
+                    <td>true</td> <td>true</td> <td>true</td> <td>true</td>
+                    <td>3</td> <td>15</td>
+                </tr>
+            </table>
+        </section>
+        <section id="multiple" name="Multiple Rollups">
+            <p>Multiple groups of rollups are possible.  Each rollup combination is itself rolled
+            up with every other rollup combination.</p>
+<source>
+List&lt;String&gt; properties = Arrays.asList("property1", "property2", "property3", "property4");
+List&lt;Aggregator&gt; aggs = Arrays.asList(Aggregator.getAggregator("Sum(value)"));
+List&lt;List&lt;Integer&gt;&gt; rollupsProps = Arrays.asList(
+    Arrays.asList(0, 1),
+    Arrays.asList(2));
+Aggregation agg = new Aggregation.Builder()
+   .setProperties(properties)
+   .setAggregators(aggs)
+   .setRollups(rollupsProps)
+   .build();
+List&lt;AggregateValue&lt;TestRec&gt;&gt; aggValues = agg.groupBy(testRecords);
+            </source>
+            <table>
+                <tr style="font-weight: bold;">
+                    <td>property1</td> <td>property2</td> <td>property3</td> <td>property4</td> <td>Sum(value)</td>
+                </tr>
+                <!-- Grouping set {0, 1, 2, 3} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td> <td>true</td> <td>2</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>red</td>  <td>false</td> <td>3</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>green</td> <td>true</td> <td>6</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td>  <td>green</td> <td>false</td> <td>10</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>true</td> <td>102</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>red</td> <td>false</td> <td>103</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>true</td> <td>106</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>green</td> <td>false</td> <td>110</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td> <td>true</td> <td>1002</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>red</td>  <td>false</td> <td>1003</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>green</td> <td>true</td> <td>1006</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td>  <td>green</td> <td>false</td> <td>1010</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>true</td> <td>1102</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>red</td> <td>false</td> <td>1103</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>true</td> <td>1106</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>green</td> <td>false</td> <td>1110</td>
+                </tr>
+                <!-- Grouping set {0, 2, 3} -->
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>red</td> <td>true</td> <td>104</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>red</td> <td>false</td> <td>106</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>green</td> <td>true</td> <td>112</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>green</td> <td>false</td> <td>120</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>red</td> <td>true</td> <td>2104</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>red</td> <td>false</td> <td>2106</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>green</td> <td>true</td> <td>2112</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>green</td> <td>false</td> <td>2120</td>
+                </tr>
+                <!-- Grouping set {2, 3} -->
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>red</td> <td>true</td> <td>2208</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>red</td> <td>false</td> <td>2212</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>green</td> <td>true</td> <td>2224</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>green</td> <td>false</td> <td>2240</td>
+                </tr>
+                <!-- Grouping set {0, 1, 3} -->
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>true</td> <td>8</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>1</td> <td>&nbsp;</td> <td>false</td> <td>13</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>true</td> <td>208</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>2</td> <td>&nbsp;</td> <td>false</td> <td>213</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>true</td> <td>2008</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>1</td> <td>&nbsp;</td> <td>false</td> <td>2013</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>true</td> <td>2208</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>2</td> <td>&nbsp;</td> <td>false</td> <td>2213</td>
+                </tr>
+                <!-- Grouping set {0, 3} -->
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>true</td> <td>216</td>
+                </tr>
+                <tr>
+                    <td>A</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>false</td> <td>226</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>true</td> <td>4216</td>
+                </tr>
+                <tr>
+                    <td>B</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>false</td> <td>4226</td>
+                </tr>
+                <!-- Grouping set {3} -->
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>true</td> <td>4432</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;</td> <td>false</td> <td>4452</td>
+                </tr>
+            </table>
+        </section>
+    </body>
+</document>

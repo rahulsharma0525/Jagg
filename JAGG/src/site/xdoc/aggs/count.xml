@@ -1,0 +1,27 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>CountAggregator</title>
+    </properties>
+    <body>
+        <section id="count" name="CountAggregator">
+            <p>A <code>CountAggregator</code> is an Aggregator that counts the values for a
+            property.  The returned number is a <code>Long</code>, always zero or positive.  It
+            will not count <code>null</code> values, unless the property given is "*"
+            (<code>CountAggregator.COUNT_ALL</code>).  This Aggregator does not use floating-point
+            calculations, so it does not override the <code>terminateDoubleDouble</code> method.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>CountAggregator</code>, with one of the following
+            methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new CountAggregator("property");</code></li>
+                <li><code>Aggregator agg = new CountAggregator(CountAggregator.COUNT_ALL);</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Count(property)");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Count(*)");</code></li>
+            </ul>
+            <p>There is no restriction on the type of property values expected.</p>
+            <p>The count is always a whole number, either 0 or a positive integer.</p>
+        </section>
+    </body>
+</document>

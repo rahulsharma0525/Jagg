@@ -1,0 +1,32 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>BigDecimalDiscriminator</title>
+    </properties>
+    <body>
+        <section id="bigDecimal" name="BigDecimalDiscriminator">
+            <p>A <code>BigDecimalDiscriminator</code> discriminates <code>BigDecimals</code>.  It
+            discriminates its input by discriminating the BigDecimal's scale first, as determined
+            by the <code>scale()</code> method, then on each element of the byte array of values
+            that make up the BigDecimal, as determined by calling
+            <code>unscaledValue().toByteArray()</code>.  Before discrimination, it calls
+            <code>stripTrailingZeros()</code> on the BigDecimal, so that BigDecimals that only
+            differ on scale, e.g. 6.00 and 6, will compare the same.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{6.00, 6, 123456789012345678901234567890, 0, -56, 6, 56, -56, 1.000}</li>
+            </ul>
+            <p>... a <code>BigDecimalDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{123456789012345678901234567890}</li>
+                <li>{0}</li>
+                <li>{56}</li>
+                <li>{1.000}</li>
+                <li>{6.00, 6, 6}</li>
+                <li>{-56, -56}</li>
+            </ul>
+        </section>
+    </body>
+</document>

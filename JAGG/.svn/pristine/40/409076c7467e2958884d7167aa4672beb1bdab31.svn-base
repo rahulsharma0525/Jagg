@@ -1,0 +1,29 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>VariancePopAggregator</title>
+    </properties>
+    <body>
+        <section id="variancePop" name="VariancePopAggregator">
+            <p>A <code>VariancePopAggregator</code> is an Aggregator that returns the population
+            variance of a numeric property as a <code>Double</code>.  The population variance is
+            <code>NaN</code> if no values were found, and it is zero if exactly one value was
+            found.  This Aggregator overrides the <code>terminateDoubleDouble</code> method, so
+            that the population variance is also available as a
+            <a href="../dd/double_double.html">DoubleDouble</a>.  This allows the population
+            variance to be used by other Aggregators as a high-precision <code>DoubleDouble</code>.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>VariancePopAggregator</code>, with one of the following
+            methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new VariancePopAggregator("property");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("VariancePop(property)");</code></li>
+            </ul>
+            <p>The values returned by the property of the object must be numeric.</p>
+            <p>The population variance is calculated by summing up the squares of the values'
+            differences from their arithmetic mean (average), then dividing that sum
+            by (<em>n</em>), where <em>n</em> is the number of non-null occurrences.</p>
+        </section>
+    </body>
+</document>

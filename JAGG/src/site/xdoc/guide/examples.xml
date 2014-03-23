@@ -1,0 +1,72 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg Examples</title>
+    </properties>
+    <body>
+        <section id="example1" name="Examples">
+            <p>Here is an example of code that uses the jAgg API:
+            </p>
+            <p>The Record class is an example class that stores data to aggregate:</p>
+            <source>
+public class Record {
+   private String trialClass;
+   private float testResult;
+   public Record(String trialClass, float result) {
+      this.trialClass = trialClass; testResult = result; }
+   public String getTrialClass() { return trialClass; }
+   public float getTestResult() { return testResult; }
+}
+            </source>
+            <p>The following is code that generates a List of Records and calls the
+            jAgg API:</p>
+            <source>
+List&lt;Record&gt; rawData = new ArrayList&lt;Record&gt;();
+rawData.add(new Record("placebo", 60.5));
+rawData.add(new Record("placebo", 62.5));
+rawData.add(new Record("placebo", 58.5));
+rawData.add(new Record("newDrug", 80.5));
+rawData.add(new Record("newDrug", 83.5));
+rawData.add(new Record("newDrug", 77.5));
+
+List&lt;String&gt; properties = new ArrayList&lt;String&gt;();
+properties.add("trialClass");
+
+List&lt;Aggregator&gt; aggregators = new ArrayList&lt;Aggregator&gt;();
+aggregators.add(new CountAggregator("*"));
+aggregators.add(new AvgAggregator("testResult"));
+aggregators.add(new StdDevAggregator("testResult"));
+
+List&lt;AggregateValue&lt;Record&gt;&gt; aggValues = Aggregations.groupBy(
+   rawData, properties, aggregators);
+
+for (AggregateValue&lt;Record&gt; aggValue : aggValues )
+{
+   Record r = aggValue.getObject();
+   StringBuffer buf = new StringBuffer();
+   buf.append(r.getTrialClass());
+   buf.append(":");
+   for (Aggregator aggregator : aggregators)
+   {
+      buf.append(" ");
+      buf.append(aggregator.toString());
+      buf.append("=");
+      buf.append(aggValue.getAggregateValue(aggregator));
+   }
+   System.out.println(buf.toString());
+}
+            </source>
+            <p>Alternatively, using <a href="../msd/msd.html">Multiset Discrimination</a>, one
+            would replace the call to "groupBy" above with the following line:</p>
+            <source>
+List&lt;AggregateValue&lt;Record&gt;&gt; aggValues = Aggregations.groupBy(
+   rawData, properties, aggregators, true);
+            </source>
+            <p>This code would output the following:</p>
+            <source>
+newDrug: Count(*)=3 Avg(testResult)=80.5 StdDev(testResult)=3
+placebo: Count(*)=3 Avg(testResult)=60.5 StdDev(testResult)=2
+            </source>
+        </section>
+    </body>
+</document>

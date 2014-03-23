@@ -1,0 +1,94 @@
+<project name="jagg">
+    <bannerLeft>
+        <name>&nbsp;jAgg</name>
+        <href>http://jagg.sourceforge.net</href>
+    </bannerLeft>
+    <bannerRight>
+      <name>SourceForge</name>
+      <src>http://sourceforge.net/sflogo.php?group_id=369830&amp;type=15</src>
+    </bannerRight>
+    <publishDate format="dd MMM yyyy"/>
+    <body>
+        <links>
+            <item name="jAgg on Sourceforge" href="http://sourceforge.net/projects/jagg"/>
+        </links>
+        <menu name="Overview">
+            <item name="Home" href="index.html"/>
+            <item name="Downloads" href="http://sourceforge.net/project/showfiles.php?group_id=369830"/>
+            <item name="Installation" href="installation.html"/>
+            <item name="Javadocs" href="apidocs/index.html"/>
+        </menu>
+        <menu name="Quick User Guide">
+            <item name="Getting Started" href="guide/getting_started.html"/>
+            <item name="Examples" href="guide/examples.html"/>
+            <item name="Aggregation Algorithm" href="guide/algorithm.html"/>
+        </menu>
+        <menu name="API">
+            <item name="Aggregation class" href="api/aggregation.html"/>
+            <item name="AggregateValue class" href="api/aggregate_value.html"/>
+            <item name="Aggregations class" href="api/aggregations.html"/>
+        </menu>
+        <menu name="Aggregators">
+            <item name="Aggregator class" href="aggs/aggregator.html"/>
+            <item name="Built-In Aggregators" href="aggs/built-in.html" collapse="true">
+                <item name="Avg" href="aggs/avg.html"/>
+                <item name="Collect" href="aggs/collect.html"/>
+                <item name="Concat" href="aggs/concat.html"/>
+                <item name="Correlation" href="aggs/correlation.html"/>
+                <item name="Count" href="aggs/count.html"/>
+                <item name="Covariance" href="aggs/covariance.html"/>
+                <item name="CovariancePop" href="aggs/covariance_pop.html"/>
+                <item name="GeometricMean" href="aggs/geometric_mean.html"/>
+                <item name="HarmonicMean" href="aggs/harmonic_mean.html"/>
+                <item name="LinearRegression" href="aggs/linear_regression.html"/>
+                <item name="Max" href="aggs/max.html"/>
+                <item name="Min" href="aggs/min.html"/>
+                <item name="Mode" href="aggs/mode.html"/>
+                <item name="Percentile" href="aggs/percentile.html"/>
+                <item name="Product" href="aggs/product.html"/>
+                <item name="StdDev" href="aggs/stddev.html"/>
+                <item name="StdDevPop" href="aggs/stddev_pop.html"/>
+                <item name="Sum" href="aggs/sum.html"/>
+                <item name="Variance" href="aggs/variance.html"/>
+                <item name="VariancePop" href="aggs/variance_pop.html"/>
+            </item>
+            <item name="Custom Aggregators" href="aggs/custom.html"/>
+        </menu>
+        <menu name="Super Aggregation">
+            <item name="Rollups" href="super/rollups.html"/>
+            <item name="Cube" href="super/cube.html"/>
+            <item name="Grouping Sets" href="super/grouping_sets.html"/>
+        </menu>
+        <menu name="Double-Double Precision">
+            <item name="DoubleDouble class" href="dd/double_double.html"/>
+        </menu>
+        <menu name="Multiset Discrimination">
+            <item name="Multiset Discrimination" href="msd/msd.html"/>
+            <item name="Built-in Discriminators" href="msd/built-in.html" collapse="true">
+                <item name="Array" href="msd/array.html"/>
+                <item name="BigDecimal" href="msd/big_decimal.html"/>
+                <item name="BigInteger" href="msd/big_integer.html"/>
+                <item name="Boolean" href="msd/boolean.html"/>
+                <item name="Byte" href="msd/byte.html"/>
+                <item name="Calendar" href="msd/calendar.html"/>
+                <item name="Character" href="msd/character.html"/>
+                <item name="CharSequence" href="msd/char_sequence.html"/>
+                <item name="Class" href="msd/class.html"/>
+                <item name="Collection" href="msd/collection.html"/>
+                <item name="Date" href="msd/date.html"/>
+                <item name="Discriminable" href="msd/discriminable.html"/>
+                <item name="Double" href="msd/double.html"/>
+                <item name="Enum" href="msd/enum.html"/>
+                <item name="Float" href="msd/float.html"/>
+                <item name="Integer" href="msd/integer.html"/>
+                <item name="Long" href="msd/long.html"/>
+                <item name="Null" href="msd/null.html"/>
+                <item name="Properties" href="msd/properties.html"/>
+                <item name="RandomAccessList" href="msd/random_access_list.html"/>
+                <item name="Short" href="msd/short.html"/>
+            </item>
+            <item name="Discriminable Interface" href="msd/discriminable_interface.html"/>
+        </menu>
+        <menu ref="reports"/>
+    </body>
+</project>

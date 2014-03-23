@@ -1,0 +1,31 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>FloatDiscriminator</title>
+    </properties>
+    <body>
+        <section id="float" name="FloatDiscriminator">
+            <p>A <code>FloatDiscriminator</code> discriminates <code>Floats</code>.  With Java's
+            auto-boxing feature, it doesn't matter whether <code>Float</code> objects or
+            <code>float</code> values are present; this Discriminator will discriminate them.  It
+            discriminates its input by discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{0.0f, -12.8f, 12.7f, 0.56f, -1.0f, 67.67f, 56.0f, -12.8f, 56.0f, -0.56f}</li>
+            </ul>
+            <p>... a <code>FloatDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{0.0f}</li>
+                <li>{12.7f}</li>
+                <li>{0.56f}</li>
+                <li>{-1.0f}</li>
+                <li>{67.67f}</li>
+                <li>{-0.56f}</li>
+                <li>{-12.8f, -12.8f}</li>
+                <li>{56.0f, 56.0f}</li>
+            </ul>
+        </section>
+    </body>
+</document>

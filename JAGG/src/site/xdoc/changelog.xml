@@ -1,0 +1,151 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Change Log for jAgg</title>
+    </properties>
+    <body>
+        <section name="jAgg 0.7.2 (Beta) Released - 22 Oct 2013">
+            <p>New in jAgg 0.7.2:</p>
+            <ul>
+                <li>Bug fix for Ticket #3.  When using super-aggregation, a <code>StdDevAggregator</code>
+                could return <code>NaN</code> instead of the correct result.  This has been fixed.</li>
+                <li>The <code>Aggregator.getValueFromProperty</code> method was <code>protected</code>.
+                It has been made <code>public</code> so outside code can use it freely.</li>
+                <li>The property name mechanism in jAgg has always assumed that there is a method
+                called "getProperty()", if the property name is "property".  Starting with this
+                version, "isProperty()" is also checked, to fit the bean naming convention for
+                getter methods that return a <code>boolean</code>.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.7.1 (Beta) Released - 05 Jul 2013">
+            <p>New in jAgg 0.7.1:</p>
+            <ul>
+                <li>Bug fix for Ticket #2.  A <code>NullPointerException</code> could occur when
+                using <code>MaxAggregator</code> or <code>MinAggregator</code> when using super
+                aggregation or parallelism.  Specifically, the <code>merge</code> method wasn't
+                null-checking its values before comparing them.  Now it null-checks its values.
+                A <code>null</code> merged with a non-<code>null</code> will yield the
+                non-<code>null</code> counterpart.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.7.0 (Beta) Released - 05 Nov 2012">
+            <p>New in jAgg 0.7.0:</p>
+            <ul>
+                <li>There is support for "super aggregation" - grouping sets, rollups, and cubes.
+                New methods in the <code>AggregateValue</code> class determine which properties
+                represent "all values" in an <code>AggregateValue</code> that represents a
+                super-aggregate value.</li>
+                <li>The new class <code>Aggregation</code> now handles the aggregation duties.  It
+                contains a static <code>Builder</code> class that builds the Aggregation object
+                based on different parameters.  The old API in the <code>Aggregations</code> class
+                still works, but it simply delegates to <code>Aggregation</code>.</li>
+                <li>There is a new "readme.txt" file.</li>
+                <li>This site has been reorganized to provide more documentation and more examples.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.6.0 (Beta) Released - 14 Aug 2012">
+            <p>New in jAgg 0.6.0:</p>
+            <ul>
+                <li>There are two new Aggregators - ModeAggregator, which finds the statistical
+                mode for a set of values, and CollectAggregator, which adds all values found into
+                a <code>List</code>.</li>
+                <li>There are two new Discriminators, for use in Multiset Discrimination:
+                DateDiscriminator and CalendarDiscriminator.</li>
+                <li>This is the first jAgg release to be submitted to the Sonatype OSS Maven
+                Repository, which will make jAgg available in the Maven Central Repository.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.5.0 (Beta) Released - 03 May 2012">
+            <p>New in jAgg 0.5.0:</p>
+            <ul>
+                <li>In 0.4.0 and before, if there were no values to aggregate, then an empty
+                <code>List</code> of <code>AggregateValues</code> was returned.  While this is
+                correct for grouping by one or more properties, this is incorrect when grouping
+                by no properties.  Now, in 0.5.0, if there are no values to aggregate, and
+                there are no properties to group by, then a <code>List</code> of one
+                <code>AggregateValue</code> is returned, with each desired Aggregator returning
+                initial values.</li>
+                <li>In 0.4.0 and before, for parallel processing, a
+                <code>NullPointerException</code> could result when using a high degree of
+                parallelism and a low cardinality in the group-by properties.  This has been
+                resolved in 0.5.0.</li>
+                <li>A new option in 0.5.0 is to use
+                <a href="reference/msd.html">Multiset Discrimination</a> instead of sorting to
+                gather groups of identical properties prior to the actual aggregation.  This is
+                only valid when specifying a group of properties, so each <code>groupBy</code>
+                method that takes a <code>List</code> of properties now  takes an optional boolean
+                parameter that indicates whether to use Multiset  Discrimination or to rely on the
+                older sorting method.  If at any time Multiset Discrimination does not work, jAgg
+                falls back on sorting.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.4.0 (Beta) Released - 12 Aug 2011">
+            <p>New in jAgg 0.4.0:</p>
+            <ul>
+                <li>Bug fix for Ticket #1: In 0.3.0 and before, only for Variance- and
+                    Covariance-related Aggregators, and only in parallel execution, sometimes the
+                    results were way off from the correct values.  This was caused due to integer
+                    division in the merge method, and this has been fixed.</li>
+                <li>Explicit "merge" JUnit test cases have been added for all relevant Aggregators
+                    and for the internal "indexOfLastMatching" method, which is used to determine
+                    the end of a run of objects that are equivalent.</li>
+                <li>The "count" member variables for all relevant Aggregators has been changed from
+                    an <code>int</code> to a <code>long</code>.</li>
+                <li>In 0.3.0 and before, for parallel processing, <em>n</em> threads were used for
+                    each run of objects that compared the same.  This was overkill, especially when
+                    cardinality was high.  Now, <em>n</em> threads are used only once for the
+                    entire run.</li>
+                <li>In 0.3.0 and before, because <code>double</code> floating-point precision was
+                    used, this led to floating-point errors would affected the precision of the
+                    results.  Now, all Aggregators use "Double-Double" precision internally where
+                    appropriate.  These now use the new <code>DoubleDouble</code> class internally,
+                    to provide much higher precision for calculations.  This class provides the
+                    following arithmetic operations: addition, subtraction, negation, multiplication,
+                    division, squaring, taking the square root, raising to an integer power, and
+                    taking the <em>n</em>th root.  All operations are now correct to a precision of
+                    1 ulp (unit in the last place) in a <code>double</code>.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.3.0 (Beta) Released - 25 Jul 2011">
+            <p>New in jAgg 0.3.0:</p>
+            <ul>
+                <li>JUnit test cases added (using JUnit 4.8.2).</li>
+                <li>ConcatAggregator - Don't add the separator if a retrieved property value was null.</li>
+                <li>LinearRegressionAggregator - Avoid ArithmeticException (divide by zero) if the
+                    variance of either variable was zero.</li>
+                <li>HarmonicMeanAggregator - Avoid ArithmeticException (divide by zero) if a retrieved
+                    property value was zero.</li>
+                <li>Ensure order is maintained in parallel aggregations, if a thread that was started
+                    later finished earlier.</li>
+                <li>When sorting a copy of the original list of objects to aggregate, avoid a
+                    NullPointerException by allowing null objects.</li>
+                <li>Fixed bug in parallel processing where the same Aggregator object could have been
+                    used by multiple threads at the same time.</li>
+                <li>The static method <code>Aggregator.getValueFromProperty</code> is now <code>protected</code>
+                    so that all custom Aggregators can access it.  (It was package scope before.)</li>
+                <li>In addition to retrieving aggregated values by calling
+                    <code>AggregateValue.getAggregateValue(Aggregator)</code>, one can now also retrieve
+                    aggregate values by index, with the overloaded
+                    <code>AggregateValue.getAggregateValue(int)</code> method.</li>
+                <li>The inheritance hierarchy has been reorganized for Variance, VariancePop, StdDev,
+                    StdDevPop, Covariance, and CovariancePop Aggregators to avoid the earlier awkward
+                    inheritance hierarchy.</li>
+                <li>The internally used <code>ExecutorCompletionService</code> (and associated
+                    <code>ThreadPoolExecutor</code> and <code>Threads</code>) is now saved for future
+                    calls.</li>
+                <li>For cleaner code, the Aggregator cache is now in its own class,
+                    <code>AggregatorCache</code>.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.2.0 (Beta) Released - 18 Apr 2011">
+            <p>New in jAgg 0.2.0:</p>
+            <ul>
+                <li>One-argument String constructors added where missing, to allow Aggregator Specification
+                    Strings on all built-in Aggregators.</li>
+            </ul>
+        </section>
+        <section name="jAgg 0.1.0 (Beta) Released - 9 Nov 2010">
+            <p>This is the initial release of jAgg.</p>
+        </section>
+    </body>
+</document>

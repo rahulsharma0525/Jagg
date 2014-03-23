@@ -1,0 +1,30 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>ShortDiscriminator</title>
+    </properties>
+    <body>
+        <section id="short" name="ShortDiscriminator">
+            <p>A <code>ShortDiscriminator</code> discriminates <code>Shorts</code>.  With Java's
+            auto-boxing feature, it doesn't matter whether <code>Short</code> objects or
+            <code>short</code> values are present; this Discriminator will discriminate them.  It
+            discriminates its input by discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{0, -128, 32767, 56, -1, 67, 56, -128, 56, -56}</li>
+            </ul>
+            <p>... a <code>ShortDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{0}</li>
+                <li>{32767}</li>
+                <li>{-1}</li>
+                <li>{67}</li>
+                <li>{-56}</li>
+                <li>{-128, -128}</li>
+                <li>{56, 56, 56}</li>
+            </ul>
+        </section>
+    </body>
+</document>

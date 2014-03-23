@@ -1,0 +1,31 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>ClassDiscriminator</title>
+    </properties>
+    <body>
+        <section id="class" name="ClassDiscriminator">
+            <p>A <code>ClassDiscriminator</code> discriminates objects based on their class names.
+            It discriminates its input by calling <code>getClass().getName()</code> to extract the
+            class names, then using a <code>CharSequenceDiscriminator</code> to discriminate on the
+            class name strings.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{"jAgg", new Integer(1), new Integer(2), "", new Widget("one"), new RuntimeException(),
+                     new ClassCastException(), new Widget("two"), new CountAggregator("*"), String.class}</li>
+            </ul>
+            <p>... a <code>ClassDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{RuntimeException()}</li>
+                <li>{ClassCastException()}</li>
+                <li>{CountAggregator("*")}</li>
+                <li>{String.class}</li>
+                <li>{"jAgg", ""}</li>
+                <li>{Integer(1), Integer(2)}</li>
+                <li>{Widget("one"), Widget("two")}</li>
+            </ul>
+        </section>
+    </body>
+</document>

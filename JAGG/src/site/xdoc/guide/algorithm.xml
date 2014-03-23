@@ -1,0 +1,49 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg Aggregations Algorithm</title>
+    </properties>
+    <body>
+        <section id="algorithm" name="jAgg Aggregations Algorithm">
+            <p>The Aggregation class uses the same general algorithm no matter which method is
+                called.  This may help to understand what the Aggregator class's abstract methods
+                are meant to accomplish.
+            </p>
+            <ol>
+                <li>Create a shallow copy of the given List of Ts.</li>
+                <li>Sort the list copy according to either the “compare” method if T is Comparable,
+                    using an internal adapter Comparator class ("ComparableComparator"), or by
+                    using another internal Comparator class (“PropertiesComparator”) based on the
+                    supplied “group by” properties.  Call Collections.sort(Collection, Comparator).
+                    Alternatively, if so specified, instead of sorting, perform
+                    <a href="../msd/msd.html">Multiset Discrimination</a> based on the supplied "group by"
+                    properties.</li>
+                <li>If parallel processing is indicated and desired, then break down the list of
+                    Ts into multiple sections that different Threads will process.  Different
+                    Threads will get different Aggregators, even for the same property, so that
+                    Aggregators do not need to be thread-safe.</li>
+                <li>For each run of Ts that compare equal, do the following:
+                    <ol>
+                        <li>Get an Aggregator for each caller-specified Aggregator using “getAggregator”.</li>
+                        <li>Initialize each Aggregator by calling “init”.</li>
+                        <li>For each T in the run, call “iterate” on each Aggregator, passing in the T
+                            object.</li>
+                        <li>If parallel processing is indicated and desired, call “merge” on some
+                            Aggregators to merge other Aggregators’ states into one.  This occurs
+                            when a run of T objects that compare the same is split between threads.</li>
+                        <li>Call “terminate” on each Aggregator that’s left, to get the final aggregate
+                            results.</li>
+                        <li>Create an object of type AggregateValue&lt;T&gt; and pass it the first T of
+                            the run.  Add aggregate results into the AggregateValue’s internal HashMap,
+                            keying on the Aggregator object.</li>
+                    </ol>
+                </li>
+                <li>If indicated, perform "super aggregation" by merging the results from previous
+                Aggregators to create new AggregateValues.  This is accomplished by calling "merge"
+                on the Aggregators used in the previous step.</li>
+                <li>Return a List of AggregateValues back to the caller.</li>
+            </ol>
+        </section>
+       
+    </body>
+</document>

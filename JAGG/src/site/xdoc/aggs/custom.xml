@@ -1,0 +1,68 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>jAgg Custom Aggregators</title>
+    </properties>
+    <body>
+        <section id="custom" name="Custom Aggregators">
+            <p>The developer can create new Aggregators that subclass Aggregator and implement its
+                abstract methods.  The methods to implement are as follows:
+            </p>
+            <ol>
+                <li>public Aggregator replicate() – Create an uninitialized copy of the Aggregator
+                    that processes the same property, for the purposes of parallel processing.</li>
+                <li>public void init() – Initialize the aggregator’s state here.  E.g., an average
+                    aggregator initializes a sum variable and a count variable to zero.  Aggregators
+                    may be reused, so they may be able to simply clear their internal state without
+                    instantiating new state objects.</li>
+                <li>public void iterate(Object value) – Process the desired value into the
+                    aggregation calculation.  E.g., an average aggregator will add the object value’s
+                    property to the sum, and also increment its count.  Use Aggregator’s static
+                    “getValueFromProperty” method to access a MethodCache, which caches Methods.  This
+                    method allows the developer to access the proper property or properties.</li>
+                <li>public void merge(Aggregator agg) – During parallel processing, multiple
+                    Aggregator objects may be processing different sections of the original List of
+                    Object values.  When an Aggregation object calls this method, it is attempting
+                    to combine the states of two Aggregator objects.  That is, the internal state
+                    of this Aggregator needs to reflect the internal state of the given Aggregator
+                    as well. E.g., an AvgAggregator would verify that the given Aggregator is also
+                    an AvgAggregator, then add its sum to its own sum and add its count to its own
+                    count.</li>
+                <li>public Object terminate() – At this point, an entire set of values whose “group
+                    by” properties compare equal has been processed.  Calculate the aggregate result
+                    and return it.  E.g., an average aggregator divides the sum by the count and
+                    returns the average (or Double.NaN if the count is zero).</li>
+                <li>public DoubleDouble terminateDoubleDouble() (Optional) - If the custom Aggregator
+                    uses <code>DoubleDoubles</code> internally, then it should override this method
+                    so that the higher precision result could be used internally by other Aggregators.
+                    Typically, if this method is overridden, then <code>terminate</code> is
+                    implemented by calling this method and returning the <code>DoubleDouble</code>
+                    result as a <code>Double</code>.</li>
+            </ol>
+            <p>Subclasses of Aggregator implement the abstract methods “init”, “iterate”, “merge”, and
+                “terminate” that do the actual aggregation.  They also implement the abstract method
+                "replicate" to return a new Aggregator of the same type, but un-initialized.  They
+                optionally override the method "terminateDoubleDouble", but only if they internally
+                use <code>DoubleDoubles</code>.
+            </p>
+            <p>The custom aggregator developer may wish to look at the source code for built-in
+                aggregators to get a better feel of what each of the above methods accomplishes.
+            </p>
+            <p>When creating an aggregator specification string for a custom Aggregator, use the
+                fully-qualified class name minus the "Aggregator" suffix, e.g.
+                "org.groupname.myproject.aggs.Custom(property1)".
+            </p>
+            <p>A custom Aggregator should also define a one-argument String constructor to store
+                the property(ies) of the Aggregator, e.g.
+                "public CustomAggregator(String property)".
+            </p>
+        </section>
+        <section id="multipleProps" name="Multiple Properties">
+            <p>If the desired custom Aggregator needs to process multiple properties, then it
+                should subclass TwoPropAggregator or MultiPropAggregator.  Those abstract classes
+                subclass Aggregator and provide the functionality to support two or more property
+                names.
+            </p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,163 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>Welcome to jAgg</title>
+    </properties>
+    <body>
+        <section name="News">
+            <p><strong>jAgg 0.7.2 (Beta) Released</strong></p>
+            <p>New in jAgg 0.7.2:</p>
+            <ul>
+                <li>Bug fix for Ticket #3.  When using super-aggregation, a <code>StdDevAggregator</code>
+                could return <code>NaN</code> instead of the correct result.  This has been fixed.</li>
+                <li>The <code>Aggregator.getValueFromProperty</code> method was <code>protected</code>.
+                It has been made <code>public</code> so outside code can use it freely.</li>
+                <li>The property name mechanism in jAgg has always assumed that there is a method
+                called "getProperty()", if the property name is "property".  Starting with this
+                version, "isProperty()" is also checked, to fit the bean naming convention for
+                getter methods that return a <code>boolean</code>.</li>
+            </ul>
+            <p>New in jAgg 0.7.1:</p>
+            <ul>
+                <li>Bug fix for Ticket #2.  A <code>NullPointerException</code> could occur when
+                using <code>MaxAggregator</code> or <code>MinAggregator</code> when using super
+                aggregation or parallelism.  Specifically, the <code>merge</code> method wasn't
+                null-checking its values before comparing them.  Now it null-checks its values.
+                A <code>null</code> merged with a non-<code>null</code> will yield the
+                non-<code>null</code> counterpart.</li>
+            </ul>
+            <p>New in jAgg 0.7.0:</p>
+            <ul>
+                <li>There is support for "super aggregation" - grouping sets, rollups, and cubes.
+                New methods in the <code>AggregateValue</code> class determine which properties
+                represent "all values" in an <code>AggregateValue</code> that represents a
+                super-aggregate value.</li>
+                <li>The new class <code>Aggregation</code> now handles the aggregation duties.  It
+                contains a static <code>Builder</code> class that builds the Aggregation object
+                based on different parameters.  The old API in the <code>Aggregations</code> class
+                still works, but it simply delegates to <code>Aggregation</code>.</li>
+                <li>There is a new "readme.txt" file.</li>
+                <li>This site has been reorganized to provide more documentation and more examples.</li>
+            </ul>
+            <p>View a history of all changes at the <a href="changelog.html">Change Log</a>.</p>
+        </section>
+        <section name="Overview">
+            <p>jAgg is a Java 5.0 API that supports “group by” operations on Lists of Java objects:
+            aggregate operations such as count, sum, max, min, avg, and many more.  It allows such
+            "super aggregate" operations as rollups and cubes.  It also allows custom aggregate
+            operations. That is, one can create <a href="aggs/custom.html">custom Aggregators</a>
+            to work with jAgg.
+            </p>
+        </section>
+        <section name="Introduction">
+            <h1>Java</h1>
+            <p>Today in Java there is no practical “group by” operation that imitates the corresponding
+                database functionality mandated by the SQL language.  That is, we can’t take an arbitrary
+                List of Objects, group them according to specific object properties, and perform aggregate
+                operations on them.  There are a few parts of Java that do begin to implement a little of
+                the desired functionality.  Some of them follow here:
+            </p>
+
+            <ol>
+            <li>The methods “Collections.min” and “Collections.max” iterate over a Collection, returning
+                the minimum or maximum, respectively, of the Collection.  The objects in the Collection
+                must be Comparable.</li>
+            <li>The method “Collections.sort” does provide a sorting capability, which is necessary
+                before object values can be aggregated.</li>
+            <li>The “Collection” class does define a “size” method that returns the count of items in a
+                Collection.</li>
+            <li>Java Specification Request (JSR) 243 is Java Data Objects (JDO) 2.0.  (JDO 1.0 was
+                specified by JSR 12).  Its main focus is object persistence and object-relational
+                mapping.  In the specification for JDO 2.2, chapter 14, a PersistenceManager offers the
+                Query capability to applications.  This supplies built-in SQL-like syntax that offers
+                limited aggregate function capabilities, with average, count, max, min, and sum supported.</li>
+            </ol>
+
+            <p>A programmer can always write specific code that loops over a List of Objects, extracts
+                the desired values, performs the aggregate calculations, and returns the aggregate result.
+                But such code is very likely to be highly coupled to existing programmer object types.
+            </p>
+
+            <h1>Oracle</h1>
+            <p>Oracle, being a relational database that supports the SQL standard, supports many
+                aggregate functions, including many that go beyond the five basic aggregate operations
+                mentioned above, like variance, covariance, standard deviation, correlation, linear
+                regression, and percentile.</p>
+            <p>Oracle also allows the database user to implement custom aggregate functions, covered
+                <a href="http://www.oracle-developer.net/display.php?id=215">here</a>.
+            </p>
+            <p>If a database programmer creates an Oracle object type with a few specific method names,
+                and associates this object type with the definition of a new function, then a new
+                aggregate function is created.  The object type must define methods for initialization,
+                value iteration (processing the next row of input), merging (merging object state for
+                parallel processing), and termination (calculation of the final result).
+            </p>
+        </section>
+        <section name="Main Features">
+            <ul>
+                <li>Ability to apply "group by" functionality to an arbitrary List of Objects</li>
+                <li>Specify "group by" properties by making List items Comparable or by supplying
+                    a list of property names, like a SQL "group by"</li>
+                <li>20 built-in aggregators, including Sum, Count, Avg, Max, and Min</li>
+                <li>Custom aggregator support</li>
+                <li>Parallel processing</li>
+                <li>Multiset Discrimination as an alternative to sorting, to gather items with
+                identical properties prior to aggregation</li>
+                <li>Super aggregate feature includes ability to create rollups and cubes</li>
+            </ul>
+        </section>
+        <section name="Use Case">
+            <p>What if a Java programmer obtains a List of Objects, from a database or another data
+                source, but wants to provide multiple or customizable views to summarize and/or breakdown
+                the data?  The programmer does not want to go back to the database or data source for each
+                breakdown a user specifies.  Such queries can be costly.
+            </p>
+            <p>A mechanism to obtain the data once, and then process aggregate functions in any manner
+                in memory is more desirable in this case.
+            </p>
+
+            <h1>Fully Dressed Use Case</h1>
+            <p>Primary Actor: Statistical Analyzer</p>
+            <p>Stakeholders and Interests:</p>
+            <ul>
+                <li>Statistical Analyzer: Wants aggregate operations performed on a list of values,
+                    without going to a database, or going back to a database from which the list of
+                    values came.</li>
+            </ul>
+            <p>Preconditions: A statistical analyzer has a List of values to analyze with one or more
+                aggregate operations.  Built-in operations include, but are not limited to, standard
+                aggregate operations such as average, count, max, min, and sum.
+            </p>
+            <p>Success guarantee: The aggregation engine generates correct values for each desired
+                aggregate operation, or it throws a RuntimeException that indicates why an operation
+                could not be performed.
+            </p>
+            <p>Main Success Scenario:</p>
+            <ol>
+                <li>A statistical analyzer has obtained a list of objects that contain one or more
+                    sets of values, and knows which aggregate operations are to be performed.</li>
+                <li>The analyzer sends the list of objects, a list of "group-by" properties, and a
+                    list of aggregate operations on specific properties to the jAgg API.</li>
+                <li>The jAgg API creates a shallow copy of the list of objects and sorts the list.</li>
+                <li>The API iterates through the sorted list, creating and using Aggregators to
+                    obtain aggregate values.</li>
+                <li>The API wraps the "group-by" values and the aggregate values in a List of
+                    AggregateValues and returns that list to the analyzer.</li>
+            </ol>
+            <p>Alternative Flows:</p>
+            <p>4a. A specified "group-by" or aggregation property name is invalid, a specified
+                property is inappropriate for a performed aggregation, or an Exception is generated
+                by an Aggregator.  No non-null values does not represent an alternative flow.
+            </p>
+                <ol>
+                    <li>The aggregator engine throws a RuntimeException to indicate that an error
+                        has occurred during the aggregation process, encapsulating any internally
+                        thrown Exception as its cause.</li>
+                </ol>
+            <p>Technology and Data Variations List:</p>
+            <p>2a. The statistical analyzer may indicate that the aggregations engine should use one
+                or more custom Aggregator objects to generate custom aggregate values.
+            </p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,31 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>CharSequenceDiscriminator</title>
+    </properties>
+    <body>
+        <section id="charSequence" name="CharSequenceDiscriminator">
+            <p>A <code>CharSequenceDiscriminator</code> discriminates <code>CharSequences</code>,
+            which includes <code>Strings</code>, <code>StringBuffers</code>, and
+            <code>StringBuilders</code>.  It doesn't matter which concrete subclass of
+            <code>CharSequence</code> is present; this Discriminator will discriminate them.  It
+            discriminates its input by calling <code>charAt</code> to extract the character values,
+            then discriminating directly on the byte values.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{"jAgg", "", "abcd", "", "jAgg", "jagg", "ABCD", " ", "jAgg", "ABCD"}</li>
+            </ul>
+            <p>... a <code>CharSequenceDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{"abcd"}</li>
+                <li>{"jagg"}</li>
+                <li>{" "}</li>
+                <li>{"jAgg", "jAgg", "jAgg"}</li>
+                <li>{"", ""}</li>
+                <li>{"ABCD", "ABCD"}</li>
+            </ul>
+        </section>
+    </body>
+</document>

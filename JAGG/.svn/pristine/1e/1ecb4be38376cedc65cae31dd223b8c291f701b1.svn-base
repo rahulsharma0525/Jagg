@@ -1,0 +1,32 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>RandomAccessListDiscriminator</title>
+    </properties>
+    <body>
+        <section id="randomAccessList" name="RandomAccessListDiscriminator">
+            <p>A <code>RandomAccessListDiscriminator</code> discriminates <code>Lists</code>.  It
+            discriminates its input by calling <code>get()</code> to extract the list elements,
+            then it uses another <code>Discriminator</code> to discriminate on the elements of the
+            list.  It determines which discriminator to use on the elements of the list based on
+            the type of the first non-null element it finds.  If the <code>Lists</code> are
+            <code>RandomAccess</code>, e.g. <code>ArrayList</code>, <code>Stack</code>,
+            <code>Vector</code>, then element access is constant-time and performance should be
+            better than for non-<code>RandomAccess Lists</code>.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{ArrayList(1, 2, 3), Stack(1, 2, 3), Vector(1, 2, 3)),
+                     ArrayList(1, 2, 4), ArrayList(5), ArrayList(3, 2, 1)}</li>
+            </ul>
+            <p>... a <code>RandomAccessListDiscriminator</code> returns the following equivalence classes:</p>
+            <ul>
+                <li>{ArrayList(1, 2, 4)}</li>
+                <li>{ArrayList(5)}</li>
+                <li>{ArrayList(3, 2, 1)}</li>
+                <li>{ArrayList(1, 2, 3), Stack(1, 2, 3), Vector(1, 2, 3)}</li>
+            </ul>
+        </section>
+    </body>
+</document>

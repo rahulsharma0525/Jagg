@@ -1,0 +1,27 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>ModeAggregator</title>
+    </properties>
+    <body>
+        <section id="mode" name="ModeAggregator">
+            <p>A <code>ModeAggregator</code> is an Aggregator that determines and returns the
+            mode of the property values, i.e. the value that occurs most often.  If no values were
+            encountered, then the mode is <code>null</code>.  If multiple modes were found, that
+            is, one value occurred as frequently as another value, then the first mode is used.
+            This Aggregator does not use floating-point calculations, so it does not override the
+            <code>terminateDoubleDouble</code> method.</p>
+        </section>
+        <section id="usage" name="Usage">
+            <p>Create and use a <code>ModeAggregator</code>, with one of the following methods:</p>
+            <ul>
+                <li><code>Aggregator agg = new ModeAggregator("property");</code></li>
+                <li><code>Aggregator agg = Aggregator.getAggregator("Mode(property)");</code></li>
+            </ul>
+            <p>The values returned by the property of the object must be <code>Comparable</code>.
+            This includes, but is not limited to, all numeric values and Strings.</p>
+            <p>The value's "compareTo" method may be called to establish the order of all object
+            values.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,37 @@
+<document>
+    <properties>
+        <author email="rgettman@users.sourceforge.net">Randy Gettman</author>
+        <title>NullDiscriminator</title>
+    </properties>
+    <body>
+        <section id="null" name="NullDiscriminator">
+            <p>A <code>NullDiscriminator</code> discriminates any objects that may contain
+            <code>null</code> values to discriminate.  The other Discriminators assume that their
+            values to discriminate are not null.  This Discriminator follows the Decorator Pattern,
+            decorating another Discriminator by giving it the ability to tolerate <code>null</code>
+            values.  jAgg wraps its Discriminators with a <code>NullDiscriminator</code> in order
+            to tolerate null values.  A <code>NullDiscriminator</code> treats all <code>null</code>
+            values as equivalent, so it maintains one equivalence class just for the
+            <code>null</code> values.  It pulls out all null values into their own equivalence
+            class, then lets its decorated Discriminator discriminate the remainder of the values.
+            Then it adds the "null" equivalence class to the list of the rest of the equivalence
+            classes.</p>
+        </section>
+        <section id="example" name="Example">
+            <p>Given the input...</p>
+            <ul>
+                <li>{"", "null", null, "not null", "famous", "infamous", null, "not null"}</li>
+            </ul>
+            <p>... a <code>NullDiscriminator(new CharSequenceDiscriminator())</code> returns the
+            following equivalence classes:</p>
+            <ul>
+                <li>{""}</li>
+                <li>{"null"}</li>
+                <li>{"famous"}</li>
+                <li>{"infamous"}</li>
+                <li>{"not null", "not null"}</li>
+                <li>{null, null}</li>
+            </ul>
+        </section>
+    </body>
+</document>
